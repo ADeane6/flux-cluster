@@ -14,7 +14,18 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
   values:
+
+    controller:
+      replicas: 1
+      strategy: RollingUpdate
     image:
       repository: jacobalberty/unifi
       tag: v7.2.95
