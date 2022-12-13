@@ -1,0 +1,85 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: unifi
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    image:
+      repository: jacobalberty/unifi
+      tag: v7.2.95
+    env:
+      RUNAS_UID0: "false"
+      UNIFI_UID: "999"
+      UNIFI_GID: "999"
+      UNIFI_STDOUT: "true"
+      TZ: 'Ireland/Dublin'
+    service:
+      lb:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: "${UNIFI_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          httplb:
+            enabled: true
+            port: 8443
+            protocol: HTTPS
+          controllerlb:
+            enabled: true
+            port: 8080
+            protocol: TCP
+          portal-httplb:
+            enabled: false
+            port: 8880
+            protocol: HTTP
+          portal-httpslb:
+            enabled: false
+            port: 8843
+            protocol: HTTPS
+          speedtestlb:
+            enabled: true
+            port: 6789
+            protocol: TCP
+          stunlb:
+            enabled: true
+            port: 3478
+            protocol: UDP
+          sysloglb:
+            enabled: true
+            port: 5514
+            protocol: UDP
+          discoverylb:
+            enabled: true
+            port: 10001
+            protocol: UDP
+      ingress:
+        main:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-production"
+            nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          ingressClassName: "nginx"
+          hosts:
+            - host: &host "unifi.${SECRET_DOMAIN}"
+              paths:
+                - path: /
+          tls:
+            - hosts:
+                - *host
+              secretName: "unifi-tls"
+    persistence:
+      config:
+        enabled: true
+        existingClaim: unifi-config
+        mountPath: /var/lib/unifi
