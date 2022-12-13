@@ -5,7 +5,7 @@ metadata:
   name: flux-cluster
   namespace: flux-system
 spec:
-  interval: 30m
+  interval: 5m
   ref:
     branch: main
   url: https://github.com/ADeane6/flux-cluster
