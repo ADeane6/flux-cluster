@@ -22,7 +22,6 @@ spec:
     remediation:
       retries: 5
   values:
-
     controller:
       replicas: 1
       strategy: RollingUpdate
@@ -36,59 +35,58 @@ spec:
       UNIFI_STDOUT: "true"
       TZ: 'Ireland/Dublin'
     service:
-      lb:
-        enabled: true
+      main:
         type: LoadBalancer
         loadBalancerIP: "${UNIFI_LB}"
         externalTrafficPolicy: Local
         ports:
-          httplb:
+          http:
             enabled: true
             port: 8443
             protocol: HTTPS
-          controllerlb:
+          controller:
             enabled: true
             port: 8080
             protocol: TCP
-          portal-httplb:
+          portal-http:
             enabled: false
             port: 8880
             protocol: HTTP
-          portal-httpslb:
+          portal-https:
             enabled: false
             port: 8843
             protocol: HTTPS
-          speedtestlb:
+          speedtest:
             enabled: true
             port: 6789
             protocol: TCP
-          stunlb:
+          stun:
             enabled: true
             port: 3478
             protocol: UDP
-          sysloglb:
+          syslog:
             enabled: true
             port: 5514
             protocol: UDP
-          discoverylb:
+          discovery:
             enabled: true
             port: 10001
             protocol: UDP
-      ingress:
-        main:
-          enabled: true
-          annotations:
-            cert-manager.io/cluster-issuer: "letsencrypt-production"
-            nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          ingressClassName: "nginx"
-          hosts:
-            - host: &host "unifi.${SECRET_DOMAIN}"
-              paths:
-                - path: /
-          tls:
-            - hosts:
-                - *host
-              secretName: "unifi-tls"
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-production"
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "unifi.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+            secretName: "unifi-tls"
     persistence:
       config:
         enabled: true
