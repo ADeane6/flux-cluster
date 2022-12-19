@@ -40,7 +40,7 @@ spec:
         loadBalancerIP: "${JACKETT_LB}"
         externalTrafficPolicy: Local
         ports:
-          http:
+          http-lb:
             enabled: true
             port: 9117
             protocol: HTTP
