@@ -1,0 +1,63 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jackett
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    image:
+      repository: lscr.io/linuxserver/jackett
+      tag: latest
+    controller:
+      replicas: 1
+      strategy: RollingUpdate
+    env:
+      TZ: 'Ireland/Dublin'
+    service:
+      main:
+        ports:
+          http:
+            port: 9117
+      lb:
+        type: LoadBalancer
+        loadBalancerIP: "${JACKETT_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            enabled: true
+            port: 9117
+            protocol: HTTP
+    ingress:
+      main:
+        enabled: true
+        annotations:
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "jackett.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        enabled: true
+        existingClaim: jackett-config
+        mountPath: /config
