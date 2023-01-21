@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./default
   - ./kube-system
-  # - ./system-upgrade
+  - ./games
