@@ -33,10 +33,10 @@ spec:
       tag: 2022.16.0-java17
     resources:
       limits:
-        memory: 10Gb
+        memory: 10Gi
       requests:
         cpu: 1000m
-        memory: 6Gb
+        memory: 6Gi
     securityContext:
       runAsUser: 1000
       fsGroup: 1000
