@@ -6,7 +6,7 @@ metadata:
   namespace: games
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: local-path
   resources:
     requests:
