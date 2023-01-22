@@ -60,12 +60,11 @@ spec:
       version: 1.19.2
       type: PAPER
       difficulty: normal
-      whitelist: "bbbiiittt"
       ops: "bbbiiittt"
       pvp: true
       motd: Meh
-      worldSaveName: Kubeworld
-      viewDistance: 12
+      worldSaveName: world
+      viewDistance: 20
       forceReDownload: true
       memory: ""
       jvmXXOpts: "-XX:MaxRAMPercentage=75"
