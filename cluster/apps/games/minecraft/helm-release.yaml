@@ -58,7 +58,7 @@ spec:
     minecraftServer:
       eula: true
       version: 1.19.2
-      type: PAPER
+      type: FORGE
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
