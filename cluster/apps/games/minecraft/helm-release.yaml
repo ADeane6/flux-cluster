@@ -49,10 +49,10 @@ spec:
     extraEnv:
       TZ: "Ireland/Dublin"
       ENABLE_ROLLING_LOGS: true
-    # persistence:
-    #   dataDir:
-    #     enabled: true
-    #     existingClaim: minecraft-data
+    persistence:
+      dataDir:
+        enabled: true
+        existingClaim: minecraft-data
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_LB}"
     minecraftServer:
