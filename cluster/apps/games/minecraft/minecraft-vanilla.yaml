@@ -33,10 +33,10 @@ spec:
       tag: 2022.16.0-java17
     resources:
       limits:
-        memory: 10Gi
+        memory: 8Gi
       requests:
         cpu: 1000m
-        memory: 7Gi
+        memory: 4Gi
     securityContext:
       runAsUser: 1000
       fsGroup: 1000
@@ -53,6 +53,9 @@ spec:
       dataDir:
         enabled: true
         existingClaim: minecraft-data
+      backupDir:
+        enabled: true
+        exisitingClaim: minecraft-data-backup
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_LB}"
     minecraftServer:
@@ -62,16 +65,12 @@ spec:
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
-      motd: Meh
+      motd: "Minecraft 1.19.2 using Forge"
       worldSaveName: world
-      viewDistance: 20
+      viewDistance: 16
       forceReDownload: true
-      memory: 6144M
-      jvmXXOpts: "-Xms6G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
-      spigetResources:
-        - 36618
-      #   # Dynmap
-      #   - 274
+      memory: 4096M
+      jvmXXOpts: "-Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
       rcon:
         enabled: true
         serviceType: ClusterIP
@@ -96,7 +95,7 @@ spec:
             type: ClusterIP
             port: 8123
           ingress:
-            ingressClassName: public
+            ingressClassName: "nginx"
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-production
@@ -107,9 +106,11 @@ spec:
               hajimari.io/icon: simple-icons:minecraft
               hajimari.io/group: games
             hosts:
-              - name: "minecraft.${SECRET_DOMAIN}"
-                path: /
+              - name: &host "minecraft.${SECRET_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
             tls:
               - secretName: "minecraft.${SECRET_DOMAIN}"
                 hosts:
-                  - "minecraft.${SECRET_DOMAIN}"
+                  - *host
