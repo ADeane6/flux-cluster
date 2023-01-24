@@ -41,4 +41,4 @@ spec:
       rconHost: minecraft-minecraft-rcon
       rconPasswordExistingSecret: rcon-password
     extraEnv:
-      TZ: ${TZ}
+      TZ: "Ireland/Dublin"
