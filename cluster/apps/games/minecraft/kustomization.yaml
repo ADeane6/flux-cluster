@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - config-pvc.yaml
   - config-pvc-minecraft-paper.yaml
-  - minecraft-vanilla.yaml
+  # - minecraft-vanilla.yaml
   - minecraft-paper.yaml
   # - rcon-web-admin.yaml
