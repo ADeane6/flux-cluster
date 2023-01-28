@@ -78,7 +78,7 @@ spec:
         enabled: true
         serviceType: ClusterIP
       spigetResources: 
-        - 274
+        # - 274
         - 32129
         - 64346
         - 87829
