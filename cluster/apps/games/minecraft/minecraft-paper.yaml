@@ -61,6 +61,9 @@ spec:
           exisitingClaim: minecraft-paper-data-backup
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
+    extraEnv:
+      MODS: "https://github.com/spnda/BlockProt/releases/download/1.1.8/blockprot-spigot-1.1.8-all.jar, https://github.com/webbukkit/dynmap/releases/download/v3.3-beta-2/Dynmap-3.3-beta-2-spigot.jar, https://github.com/EssentialsX/Essentials/releases/download/2.19.7/EssentialsX-2.19.7.jar"
+      SPIGET_RESOURCES: "32129,64346"
     minecraftServer:
       eula: true
       version: 1.19.2
@@ -77,10 +80,6 @@ spec:
       rcon:
         enabled: true
         serviceType: ClusterIP
-      spigetResources: 
-        - 32129
-        - 64346
-        - 9089
       serviceType: LoadBalancer
       extraPorts:
         - name: metrics
