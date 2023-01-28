@@ -36,9 +36,10 @@ spec:
             - *host
     rconWeb:
       isAdmin: true
-      passwordExistingSecret: rcon-password
+      passwordExistingSecret: minecraft-rcon-credentials
       passwordKey: rcon-password
-      rconHost: minecraft-minecraft-rcon
-      rconPasswordExistingSecret: rcon-password
+      rconHost: minecraft-paper-minecraft-rcon
+      rconPasswordExistingSecret: minecraft-rcon-credentials
+      rconPasswordKey: rcon-password
     extraEnv:
       TZ: "Ireland/Dublin"
