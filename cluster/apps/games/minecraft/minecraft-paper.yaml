@@ -77,8 +77,12 @@ spec:
       rcon:
         enabled: true
         serviceType: ClusterIP
-      extraEnv:
-        SPIGET_RESOURCES: "274,32129,64346,87829,9089" 
+      spigetResources: 
+        - 274
+        - 32129
+        - 64346
+        - 87829
+        - 9089
       serviceType: LoadBalancer
       extraPorts:
         - name: metrics
