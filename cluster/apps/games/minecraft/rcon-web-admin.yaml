@@ -35,7 +35,7 @@ spec:
       isAdmin: true
       passwordExistingSecret: minecraft-rcon-credentials
       passwordKey: rcon-password
-      rconHost: minecraft-paper-minecraft-rcon
+      rconHost: minecraft-paper-minecraft-rcon.games.svc.cluster.local
       rconPasswordExistingSecret: minecraft-rcon-credentials
       rconPasswordKey: rcon-password
     extraEnv:

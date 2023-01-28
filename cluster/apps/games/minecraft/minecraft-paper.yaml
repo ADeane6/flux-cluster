@@ -79,8 +79,7 @@ spec:
       rcon:
         enabled: true
         existingSecret: minecraft-rcon-credentials
-        serviceType: LoadBalancer
-        loadBalancerIP: ${MINECRAFT_PAPER_RCON_LB}
+        serviceType: ClusterIP
       serviceType: LoadBalancer
       extraPorts:
         - name: metrics
