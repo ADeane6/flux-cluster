@@ -47,7 +47,7 @@ spec:
     startupProbe:
       enabled: false
     extraEnv:
-      MODS: "https://github.com/spnda/BlockProt/releases/download/1.1.8/blockprot-spigot-1.1.8-all.jar, https://github.com/webbukkit/dynmap/releases/download/v3.3-beta-2/Dynmap-3.3-beta-2-spigot.jar, https://github.com/EssentialsX/Essentials/releases/download/2.19.7/EssentialsX-2.19.7.jar"
+      MODS: "https://github.com/spnda/BlockProt/releases/download/1.1.8/blockprot-spigot-1.1.8-all.jar, https://mc-plugins.net/cdn/plugins/bukkit/dynmap_3.4-828.jar, https://github.com/EssentialsX/Essentials/releases/download/2.19.7/EssentialsX-2.19.7.jar"
       SPIGET_RESOURCES: "32129,64346"
       TZ: "Ireland/Dublin"
       ENABLE_ROLLING_LOGS: true
