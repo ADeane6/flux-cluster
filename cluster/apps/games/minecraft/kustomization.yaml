@@ -5,4 +5,4 @@ resources:
   - config-pvc-minecraft-paper.yaml
   - minecraft-vanilla.yaml
   - minecraft-paper.yaml
-  - rcon-web-admin.yaml
+  # - rcon-web-admin.yaml

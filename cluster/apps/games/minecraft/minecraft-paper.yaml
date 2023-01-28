@@ -53,6 +53,12 @@ spec:
       dataDir:
         enabled: true
         existingClaim: minecraft-paper-data
+    mcbackup:
+      enabled: true
+      persistence:
+        backupDir:
+          enabled: true
+          exisitingClaim: minecraft-paper-data-backup
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
     minecraftServer:
@@ -71,6 +77,8 @@ spec:
       rcon:
         enabled: true
         serviceType: ClusterIP
+      extraEnv:
+        SPIGET_RESOURCES: "274,32129,64346,87829,9089" 
       serviceType: LoadBalancer
       extraPorts:
         - name: metrics
@@ -95,13 +103,13 @@ spec:
             ingressClassName: "nginx"
             enabled: true
             annotations:
-              # cert-manager.io/cluster-issuer: letsencrypt-production
-              # external-dns.home.arpa/enabled: "true"
-              # external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
-              # hajimari.io/appName: Minecraft
-              # hajimari.io/enable: "true"
-              # hajimari.io/icon: simple-icons:minecraft
-              # hajimari.io/group: games
+              cert-manager.io/cluster-issuer: letsencrypt-production
+              external-dns.home.arpa/enabled: "true"
+              external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+              hajimari.io/appName: Minecraft-paper
+              hajimari.io/enable: "true"
+              hajimari.io/icon: simple-icons:minecraft
+              hajimari.io/group: games
             hosts:
               - name: &host "minecraft-paper.${SECRET_DOMAIN}"
                 paths:

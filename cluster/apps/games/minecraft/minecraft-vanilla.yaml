@@ -53,9 +53,12 @@ spec:
       dataDir:
         enabled: true
         existingClaim: minecraft-data
-      backupDir:
-        enabled: true
-        exisitingClaim: minecraft-data-backup
+    mcbackup:
+      enabled: true
+      persistence:
+        backupDir:
+          enabled: true
+          exisitingClaim: minecraft-data-backup
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_LB}"
     minecraftServer:
