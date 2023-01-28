@@ -78,10 +78,8 @@ spec:
         enabled: true
         serviceType: ClusterIP
       spigetResources: 
-        # - 274
         - 32129
         - 64346
-        - 87829
         - 9089
       serviceType: LoadBalancer
       extraPorts:
