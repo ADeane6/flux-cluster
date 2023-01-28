@@ -26,10 +26,7 @@ spec:
         cpu: 400m
     ingress:
       enabled: true
-      hosts:
-        - host: &host "rcon.${SECRET_DOMAIN}"
-          path: /
-          pathType: Prefix
+      host: &host "rcon.${SECRET_DOMAIN}"
       tls:
         - secretName: "rcon-server-tls"
           hosts:
