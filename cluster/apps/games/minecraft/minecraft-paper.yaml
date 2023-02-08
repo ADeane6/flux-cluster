@@ -48,7 +48,7 @@ spec:
       enabled: false
     extraEnv:
       MODS: "https://github.com/spnda/BlockProt/releases/download/1.1.8/blockprot-spigot-1.1.8-all.jar, https://mc-plugins.net/cdn/plugins/bukkit/dynmap_3.4-828.jar, https://github.com/EssentialsX/Essentials/releases/download/2.19.7/EssentialsX-2.19.7.jar, https://mediafilez.forgecdn.net/files/4162/203/worldedit-bukkit-7.2.13.jar, https://mediafilez.forgecdn.net/files/3903/109/worldguard-bukkit-7.0.8-beta-01-dist.jar"
-      SPIGET_RESOURCES: "23307,32129,64346,60383"
+      SPIGET_RESOURCES: "23307,28140,32129,64346,60383"
       TZ: "Ireland/Dublin"
       ENABLE_ROLLING_LOGS: true
     persistence:
