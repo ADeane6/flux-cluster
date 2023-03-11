@@ -86,7 +86,7 @@ spec:
         tls:
           - hosts:
               - *host
-            secretName: hass-tls"
+            secretName: "hass-tls"
     resources:
       requests:
         cpu: 50m
