@@ -7,3 +7,4 @@ resources:
   - ./unifi
   - ./jackett
   - ./echo-server
+  - ./home-assistant
