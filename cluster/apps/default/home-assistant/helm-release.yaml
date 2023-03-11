@@ -38,28 +38,16 @@ spec:
       #   subPath:
       #     - path: GH_DEPLOY_KEY
       #       mountPath: /root/.ssh/id_rsa
-    mariadb:
-      enabled: false
-    postgresql:
-      enabled: false
-    influxdb:
-      enabled: false  
     env:
       TZ: "Europe/Berlin"
     service:
       main:
-        ports:
-          http:
-            port: &port 8123
-      lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
         externalTrafficPolicy: Local
         ports:
-          http-lb:
-            enabled: true
+          http:
             port: 8123
-            protocol: HTTP
     probes:
       liveness:
         enabled: false
@@ -73,8 +61,6 @@ spec:
         ingressClassName: "nginx"
         annotations:
           cert-manager.io/cluster-issuer: "letsencrypt-production"
-          # external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
-          # external-dns/is-public: "true"
           nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
           hajimari.io/enable: "true"
           hajimari.io/icon: "video-input-antenna"
@@ -89,10 +75,10 @@ spec:
             secretName: "hass-tls"
     resources:
       requests:
-        cpu: 50m
-        memory: 64Mi
+        cpu: 500m
+        memory: 1024Mi
       limits:
-        memory: 96Mi
+        memory: 2048Mi
     addons:
       codeserver:
         enabled: true
