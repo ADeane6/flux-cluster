@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
-      tag: 2023.2.2
+      tag: 2023.3
     persistence:
       config:
         enabled: true
@@ -39,15 +39,21 @@ spec:
       #     - path: GH_DEPLOY_KEY
       #       mountPath: /root/.ssh/id_rsa
     env:
-      TZ: "Europe/Berlin"
+      TZ: "Europe/Dublin"
     service:
       main:
+        ports:
+          http:
+            port: 8123
+      lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
         externalTrafficPolicy: Local
         ports:
-          http:
+          http-lb:
+            enabled: true
             port: 8123
+            protocol: HTTP
     probes:
       liveness:
         enabled: false
@@ -61,14 +67,12 @@ spec:
         ingressClassName: "nginx"
         annotations:
           cert-manager.io/cluster-issuer: "letsencrypt-production"
-          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
           hajimari.io/enable: "true"
           hajimari.io/icon: "video-input-antenna"
         hosts:
           - host: &host "hass.${SECRET_DOMAIN}"
             paths:
               - path: /
-                pathType: Prefix
         tls:
           - hosts:
               - *host
