@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
-      tag: 2023.3.3
+      tag: 2023.6.2
     persistence:
       config:
         enabled: true
@@ -92,8 +92,8 @@ spec:
           repository: ghcr.io/coder/code-server
           tag: 4.9.1
         volumeMounts:
-        - name: config
-          mountPath: /config
+          - name: config
+            mountPath: /config
         # git:
         #   # -- Existing secret containing SSH private key
         #   # The chart expects it to be present under the `id_rsa` key.
@@ -109,11 +109,11 @@ spec:
             hajimari.io/info: Home-Assistant Editor
             hajimari.io/group: automation
           hosts:
-          - host: &codeHost "editor.hass.${SECRET_DOMAIN}"
-            paths:
-            - path: /
-              pathType: Prefix
+            - host: &codeHost "editor.hass.${SECRET_DOMAIN}"
+              paths:
+                - path: /
+                  pathType: Prefix
           tls:
-          - hosts:
-            - *codeHost
-            secretName: "hass-editor-tls"
+            - hosts:
+                - *codeHost
+              secretName: "hass-editor-tls"
