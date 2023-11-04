@@ -8,3 +8,5 @@ resources:
   - ./jackett
   - ./echo-server
   - ./home-assistant
+  # - ./zigbee2mqtt
+  - ./mosquitto

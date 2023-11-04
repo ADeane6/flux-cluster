@@ -1,3 +1,33 @@
+# Extra notes
+## SOPS
+```
+# Create sops file
+sops secret.sops.yaml
+```
+Example Contents
+```
+# yamllint disable
+apiVersion: v1
+kind: Secret
+metadata:
+    name: secerts
+    namespace: default
+type: Opaque
+stringData:
+    SECRET_1: SUPER_SECRET
+```
+
+## App template
+used for most containers, More details
+https://bjw-s.github.io/helm-charts/docs/app-template/
+
+### PVC
+https://bjw-s.github.io/helm-charts/docs/common-library/storage/types/persistentVolumeClaim/
+
+use exsitingClaim format
+
+
+
 # Template for deploying k3s backed by Flux
 
 Highly opinionated template for deploying a single [k3s](https://k3s.io) cluster with [Ansible](https://www.ansible.com) and [Terraform](https://www.terraform.io) backed by [Flux](https://toolkit.fluxcd.io/) and [SOPS](https://toolkit.fluxcd.io/guides/mozilla-sops/).
