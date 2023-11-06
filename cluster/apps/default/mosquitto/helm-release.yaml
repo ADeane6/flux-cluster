@@ -46,7 +46,7 @@ spec:
         loadBalancerIP: "${MQTT_LB}"
         externalTrafficPolicy: Cluster
         ports:
-          mqtt:
+          http:
             port: 1883
     probes:
       liveness:
