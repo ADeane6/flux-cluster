@@ -25,7 +25,7 @@ spec:
     image:
       repository: public.ecr.aws/docker/library/eclipse-mosquitto
       tag: 2.0.18
-    securityContext:
+    podSecurityContext:
       fsGroup: 1883
     persistence:
       data:
