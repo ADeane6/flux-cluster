@@ -40,6 +40,7 @@ spec:
         type: secret
         name: mosquitto
         mountPath: /mosquitto/external_config/mosquitto_pwd
+        subPath: mosquitto_pwd
     env:
       TZ: "Europe/Dublin"
     service:
