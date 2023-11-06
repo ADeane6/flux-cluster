@@ -30,11 +30,13 @@ spec:
         enabled: true
         existingClaim: mosquitto-data
       config:
+        enabled: true
         type: configMap
         name: mosquitto-config
         mountPath: /mosquitto/config/mosquitto.conf
         subPath: mosquitto.conf
       secret:
+        enabled: true
         type: secret
         name: mosquitto
         mountPath: /mosquitto/external_config/mosquitto_pwd
