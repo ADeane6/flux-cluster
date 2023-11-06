@@ -5,7 +5,12 @@ namespace: default
 resources:
   - ./helm-release.yaml
   - ./mosquitto-pvc.yaml
+  - ./secret.sops.yaml
 configMapGenerator:
   - name: mosquitto-config
     files:
       - mosquitto.conf=./config/mosquitto.conf
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
