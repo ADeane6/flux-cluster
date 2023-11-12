@@ -22,6 +22,10 @@ spec:
     remediation:
       retries: 5
   values:
+
+    controller:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2023.6.2
@@ -69,8 +73,8 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
-          hue-lb:
-            port: 80
+          # hue-lb:
+          #   port: 80
 
     probes:
       liveness:
