@@ -45,6 +45,8 @@ spec:
         ports:
           http:
             port: 8123
+          hue:
+            port: 80
       lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
@@ -54,6 +56,11 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
+          hue-lb:
+            enabled: true
+            port: 80
+            protocol: HTTP
+          
     probes:
       liveness:
         enabled: false
