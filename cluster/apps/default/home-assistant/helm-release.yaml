@@ -45,6 +45,8 @@ spec:
         ports:
           http:
             port: 8123
+          hue:
+            port: 80
       node:
         enabled: true
         controller: main
@@ -54,6 +56,10 @@ spec:
             port: 30080
             targetPort: 30080
             nodePort: 30080
+          roku:
+            port: 30081
+            targetPort: 30081
+            nodePort: 30081
       lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
@@ -63,6 +69,8 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
+          hue:
+            port: 80
 
     probes:
       liveness:
