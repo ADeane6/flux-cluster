@@ -85,9 +85,6 @@ spec:
           - host: &host "hass.${SECRET_DOMAIN}"
             paths:
               - path: /
-                service:
-                  name: main
-                  port: 8123
         tls:
           - hosts:
               - *host
