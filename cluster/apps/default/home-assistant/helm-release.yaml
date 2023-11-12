@@ -51,6 +51,7 @@ spec:
         type: NodePort
         ports:
           hue:
+            port: 30080
             targetPort: 30080
             nodePort: 30080
       lb:
