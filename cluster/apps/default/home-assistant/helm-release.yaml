@@ -22,8 +22,10 @@ spec:
     remediation:
       retries: 5
   values:
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
+    contoller:
+      main:
+        hostNetwork: true
+        dnsPolicy: ClusterFirstWithHostNet
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2023.6.2
