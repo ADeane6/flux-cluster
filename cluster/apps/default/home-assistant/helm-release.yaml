@@ -45,8 +45,14 @@ spec:
         ports:
           http:
             port: 8123
+      node:
+        enabled: true
+        controller: main
+        type: NodePort
+        ports:
           hue:
-            port: 80
+            targetPort: 30080
+            nodePort: 30080
       lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
@@ -56,11 +62,7 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
-          hue-lb:
-            enabled: true
-            port: 80
-            protocol: HTTP
-          
+
     probes:
       liveness:
         enabled: false
@@ -82,6 +84,9 @@ spec:
           - host: &host "hass.${SECRET_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: 8123
         tls:
           - hosts:
               - *host
