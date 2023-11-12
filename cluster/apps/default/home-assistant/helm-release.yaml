@@ -45,7 +45,7 @@ spec:
         ports:
           http:
             port: 8123
-          hue:
+          p80:
             port: 80
       node:
         enabled: true
@@ -69,7 +69,7 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
-          hue:
+          hue-lb:
             port: 80
 
     probes:
