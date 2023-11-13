@@ -22,10 +22,6 @@ spec:
     remediation:
       retries: 5
   values:
-    controller:
-      main:
-        hostNetwork: true
-        dnsPolicy: ClusterFirstWithHostNet
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2023.6.2
@@ -49,21 +45,6 @@ spec:
         ports:
           http:
             port: 8123
-          p80:
-            port: 80
-      node:
-        enabled: true
-        controller: main
-        type: NodePort
-        ports:
-          hue:
-            port: 30080
-            targetPort: 30080
-            nodePort: 30080
-          roku:
-            port: 30081
-            targetPort: 30081
-            nodePort: 30081
       lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
@@ -73,8 +54,8 @@ spec:
             enabled: true
             port: 8123
             protocol: HTTP
-          # hue-lb:
-          #   port: 80
+          hue-lb:
+            port: 80
 
     probes:
       liveness:
