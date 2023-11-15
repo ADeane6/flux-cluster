@@ -24,7 +24,8 @@ spec:
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
-      tag: 2023.6.2
+      tag: 2023.11.2
+      # Versions: https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged
     persistence:
       config:
         enabled: true
