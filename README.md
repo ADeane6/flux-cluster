@@ -21,11 +21,34 @@ stringData:
 used for most containers, More details
 https://bjw-s.github.io/helm-charts/docs/app-template/
 
+#### Source: 1.2.0
+https://github.com/bjw-s/helm-charts/tree/72670526a3b68a5b7e4b669c76feaef6aea076b5
+
+### Good source
+source of current app-template version templates
+https://github.com/bjw-s/helm-charts/tree/72670526a3b68a5b7e4b669c76feaef6aea076b5/charts/library/common/templates/lib/controller
+
 ### PVC
 https://bjw-s.github.io/helm-charts/docs/common-library/storage/types/persistentVolumeClaim/
 
 use exsitingClaim format
 
+
+## Useful commands
+
+```
+# Update cluster from git
+flux reconcile source git flux-cluster
+
+# Debugging
+## Shows all helm releases in flux
+flux get helmreleases -A
+## logs of helm controller
+kubectl logs -n flux-system $(kubectl get pod -n flux-system --field-selector=status.phase=Running |  awk '/helm-controller*/{print $1}') -f
+
+
+
+```
 
 
 # Template for deploying k3s backed by Flux
