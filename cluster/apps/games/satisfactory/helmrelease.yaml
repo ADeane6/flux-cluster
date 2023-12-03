@@ -34,6 +34,9 @@ spec:
         externalTrafficPolicy: Local
         loadBalancerIP: "${SATISFACTORY_LB}"
         ports:
+          http:
+            enabled: false
+            primary: false
           query:
             enabled: true
             port: 15777
