@@ -10,3 +10,4 @@ resources:
   - ./home-assistant
   # - ./zigbee2mqtt
   - ./mosquitto
+  - ./tautulli
