@@ -1,0 +1,74 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app palworld
+  namespace: games
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    image:
+      repository: thijsvanloef/palworld-server-docker
+      tag: v0.19.0
+    env:
+      PUID: "1000"
+      PGID: "1000"
+      PORT: "8211"
+      PLAYERS: "16"
+      MULTITHREADING: "true"
+      RCON_ENABLED: "false"
+      TZ: UTC
+      COMMUNITY: "false"
+      SERVER_NAME: "World of Pals"
+      SERVER_DESCRIPTION: ""
+    envFrom:
+      - secretRef:
+          name: palworld-secret
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: "${PALWORLD_LB}"
+        ports:
+          http:
+            enabled: false
+            primary: false
+          port1:
+            enabled: true
+            port: 8211
+            protocol: UDP
+          port2:
+            enabled: true
+            port: 27015
+            protocol: UDP
+    persistence:
+      config:
+        enabled: true
+        existingClaim: palworld-data
+        mountPath: /palworld
+    probes:
+      startup:
+        enabled: false
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 16384Mi
