@@ -40,7 +40,7 @@ spec:
       - secretRef:
           name: palworld-secret
     service:
-      lb:
+      main:
         type: LoadBalancer
         externalTrafficPolicy: Local
         loadBalancerIP: "${PALWORLD_LB}"
