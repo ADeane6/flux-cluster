@@ -24,18 +24,17 @@ spec:
   values:
     image:
       repository: thijsvanloef/palworld-server-docker
-      tag: v0.19.0
+      tag: v0.19.1
     env:
-      PUID: "1000"
-      PGID: "1000"
-      PORT: "8211"
-      PLAYERS: "16"
-      MULTITHREADING: "true"
-      RCON_ENABLED: "false"
+      PUID: 1000
+      PGID: 1000
+      PORT: 8211
+      PLAYERS: 16
+      MULTITHREADING: true
+      RCON_ENABLED: false
       TZ: UTC
-      COMMUNITY: "false"
-      SERVER_NAME: "World of Pals"
-      SERVER_DESCRIPTION: ""
+      COMMUNITY: false
+      SERVER_NAME: World of Pals
     envFrom:
       - secretRef:
           name: palworld-secret
