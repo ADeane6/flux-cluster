@@ -35,6 +35,8 @@ spec:
       TZ: UTC
       COMMUNITY: false
       SERVER_NAME: World of Pals
+      BASE_CAMP_WORKER_MAXNUM: 25
+      COOP_PLAYER_MAX_NUM: 8
     envFrom:
       - secretRef:
           name: palworld-secret
