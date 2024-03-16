@@ -7,6 +7,7 @@ resources:
   - ./unifi
   - ./jackett
   - ./home-assistant
-  - ./zigbee2mqtt
+  # Back and than delete zha before enabling
+  # - ./zigbee2mqtt
   - ./mosquitto
   - ./tautulli
