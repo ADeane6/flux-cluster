@@ -8,6 +8,6 @@ resources:
   - ./jackett
   - ./home-assistant
   # Back and than delete zha before enabling
-  # - ./zigbee2mqtt
+  - ./zigbee2mqtt
   - ./mosquitto
   - ./tautulli
