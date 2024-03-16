@@ -7,6 +7,6 @@ resources:
   - ./unifi
   - ./jackett
   - ./home-assistant
-  # - ./zigbee2mqtt
+  - ./zigbee2mqtt
   - ./mosquitto
   - ./tautulli
