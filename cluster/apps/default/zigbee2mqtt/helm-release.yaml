@@ -54,7 +54,7 @@ spec:
       ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
       ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: "true"
       ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: "false"
-      ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://10.0.1.54:8888
+      ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://10.0.1.51:8888
     envFrom:
       - secretRef:
           name: zigbee2mqtt
