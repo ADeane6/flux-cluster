@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: whisper
+  name: piper
   namespace: default
 spec:
   interval: 30m
@@ -30,27 +30,25 @@ spec:
       replicas: 1
       strategy: RollingUpdate
     image:
-      repository: rhasspy/wyoming-whisper
+      repository: rhasspy/wyoming-piper
       tag: latest
     args:
-      - --model
-      - medium
-      - --language
-      - en
+      - --voice
+      - en_GB-vctk-medium
 
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: "${WHISPER_LB}"
+        loadBalancerIP: "${PIPER_LB}"
         externalTrafficPolicy: Local
         ports:
           http:
             enabled: true
-            port: 10300
+            port: 10200
             protocol: TCP
 
     persistence:
       config:
         enabled: true
-        existingClaim: whisper-data
+        existingClaim: piper-data
         mountPath: /data

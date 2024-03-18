@@ -49,19 +49,6 @@ spec:
             port: 10400
             protocol: TCP
 
-    ingress:
-      app:
-        enabled: true
-        annotations:
-        ingressClassName: "nginx"
-        hosts:
-          - host: &host "openwakeword.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-              - *host
-
     persistence:
       config:
         enabled: true
