@@ -1,0 +1,75 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: openwakeword
+  namespace: default
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 0
+        containers:
+          main:
+            image:
+              repository: rhasspy/wyoming-openwakeword
+              tag: 1.10.0
+            args:
+              - --preload-model
+              - "ok_nabu"
+              - --custom-model-dir
+              - /custom
+
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${OPENWAKEWORD_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            enabled: true
+            port: 10400
+            protocol: TCP
+
+    ingress:
+      app:
+        enabled: true
+        annotations:
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "openwakeword.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: openwakeword
+        globalMounts:
+          - path: /custom
