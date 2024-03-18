@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: whisper
+  name: whisper2
   namespace: default
 spec:
   interval: 30m
@@ -34,14 +34,14 @@ spec:
       tag: latest
     args:
       - --model
-      - tiny
+      - medium
       - --language
       - en
 
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: "${WHISPER_LB}"
+        loadBalancerIP: "${WHISPER2_LB}"
         externalTrafficPolicy: Local
         ports:
           http:
@@ -49,8 +49,15 @@ spec:
             port: 10300
             protocol: TCP
 
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2048Mi
+      limits:
+        memory: 4096Mi
+
     persistence:
       config:
         enabled: true
-        existingClaim: whisper-data
+        existingClaim: whisper2-data
         mountPath: /data
