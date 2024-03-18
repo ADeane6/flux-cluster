@@ -9,5 +9,6 @@ resources:
   - ./home-assistant
   - ./zigbee2mqtt
   - ./openwakeword
+  - ./whisper
   - ./mosquitto
   - ./tautulli
