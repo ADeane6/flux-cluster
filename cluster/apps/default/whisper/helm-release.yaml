@@ -34,7 +34,7 @@ spec:
       tag: latest
     args:
       - --model
-      - tiny
+      - medium
       - --language
       - en
 
@@ -48,6 +48,13 @@ spec:
             enabled: true
             port: 10300
             protocol: TCP
+
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 5Gi
+      limits:
+        memory: 10Gi
 
     persistence:
       config:
