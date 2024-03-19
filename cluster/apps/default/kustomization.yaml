@@ -10,7 +10,7 @@ resources:
   - ./zigbee2mqtt
   - ./openwakeword
   - ./whisper
-  - ./whisper2
+  - ./whisper-2
   - ./piper
   - ./mosquitto
   - ./tautulli
