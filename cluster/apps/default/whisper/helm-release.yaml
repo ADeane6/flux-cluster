@@ -34,9 +34,11 @@ spec:
       tag: latest
     args:
       - --model
-      - medium
+      - medium-int8
       - --language
       - en
+      - --beam
+      - "5"
 
     service:
       main:
@@ -51,10 +53,10 @@ spec:
 
     resources:
       requests:
-        cpu: 2000m
-        memory: 5Gi
-      limits:
+        cpu: 4000m
         memory: 10Gi
+      limits:
+        memory: 20Gi
 
     persistence:
       config:
