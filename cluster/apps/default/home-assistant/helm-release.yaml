@@ -57,6 +57,9 @@ spec:
             protocol: HTTP
           hue-lb:
             port: 80
+          udp-10500:
+            port: 10500
+            protocol: UDP
 
     probes:
       liveness:

@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
   - ./helm-release.yaml
   - ./home-assistant-pvc.yaml
+patchesStrategicMerge:
+  - load-balancer.yaml
