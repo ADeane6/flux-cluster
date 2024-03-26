@@ -1,4 +1,3 @@
-
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -18,156 +17,150 @@ spec:
             protocol: HTTP
           hue-lb:
             port: 80
-          udp-10400:
-            port: 10400
+          udp-10502:
+            port: 10502
             protocol: UDP
-          udp-10401:
-            port: 10401
+          udp-10503:
+            port: 10503
             protocol: UDP
-          udp-10402:
-            port: 10402
+          udp-10504:
+            port: 10504
             protocol: UDP
-          udp-10403:
-            port: 10403
+          udp-10505:
+            port: 10505
             protocol: UDP
-          udp-10404:
-            port: 10404
+          udp-10506:
+            port: 10506
             protocol: UDP
-          udp-10405:
-            port: 10405
+          udp-10507:
+            port: 10507
             protocol: UDP
-          udp-10406:
-            port: 10406
+          udp-10508:
+            port: 10508
             protocol: UDP
-          udp-10407:
-            port: 10407
+          udp-10509:
+            port: 10509
             protocol: UDP
-          udp-10408:
-            port: 10408
+          udp-10510:
+            port: 10510
             protocol: UDP
-          udp-10409:
-            port: 10409
+          udp-10511:
+            port: 10511
             protocol: UDP
-          udp-10410:
-            port: 10410
+          udp-10512:
+            port: 10512
             protocol: UDP
-          udp-10411:
-            port: 10411
+          udp-10513:
+            port: 10513
             protocol: UDP
-          udp-10412:
-            port: 10412
+          udp-10514:
+            port: 10514
             protocol: UDP
-          udp-10413:
-            port: 10413
+          udp-10515:
+            port: 10515
             protocol: UDP
-          udp-10414:
-            port: 10414
+          udp-10516:
+            port: 10516
             protocol: UDP
-          udp-10415:
-            port: 10415
+          udp-10517:
+            port: 10517
             protocol: UDP
-          udp-10416:
-            port: 10416
+          udp-10518:
+            port: 10518
             protocol: UDP
-          udp-10417:
-            port: 10417
+          udp-10519:
+            port: 10519
             protocol: UDP
-          udp-10418:
-            port: 10418
+          udp-10520:
+            port: 10520
             protocol: UDP
-          udp-10419:
-            port: 10419
+          udp-10521:
+            port: 10521
             protocol: UDP
-          udp-10420:
-            port: 10420
+          udp-10522:
+            port: 10522
             protocol: UDP
-          udp-10421:
-            port: 10421
+          udp-10523:
+            port: 10523
             protocol: UDP
-          udp-10422:
-            port: 10422
+          udp-10524:
+            port: 10524
             protocol: UDP
-          udp-10423:
-            port: 10423
+          udp-10525:
+            port: 10525
             protocol: UDP
-          udp-10424:
-            port: 10424
+          udp-10526:
+            port: 10526
             protocol: UDP
-          udp-10425:
-            port: 10425
+          udp-10527:
+            port: 10527
             protocol: UDP
-          udp-10426:
-            port: 10426
+          udp-10528:
+            port: 10528
             protocol: UDP
-          udp-10427:
-            port: 10427
+          udp-10529:
+            port: 10529
             protocol: UDP
-          udp-10428:
-            port: 10428
+          udp-10530:
+            port: 10530
             protocol: UDP
-          udp-10429:
-            port: 10429
+          udp-10531:
+            port: 10531
             protocol: UDP
-          udp-10430:
-            port: 10430
+          udp-10532:
+            port: 10532
             protocol: UDP
-          udp-10431:
-            port: 10431
+          udp-10533:
+            port: 10533
             protocol: UDP
-          udp-10432:
-            port: 10432
+          udp-10534:
+            port: 10534
             protocol: UDP
-          udp-10433:
-            port: 10433
+          udp-10535:
+            port: 10535
             protocol: UDP
-          udp-10434:
-            port: 10434
+          udp-10536:
+            port: 10536
             protocol: UDP
-          udp-10435:
-            port: 10435
+          udp-10537:
+            port: 10537
             protocol: UDP
-          udp-10436:
-            port: 10436
+          udp-10538:
+            port: 10538
             protocol: UDP
-          udp-10437:
-            port: 10437
+          udp-10539:
+            port: 10539
             protocol: UDP
-          udp-10438:
-            port: 10438
+          udp-10540:
+            port: 10540
             protocol: UDP
-          udp-10439:
-            port: 10439
+          udp-10541:
+            port: 10541
             protocol: UDP
-          udp-10440:
-            port: 10440
+          udp-10542:
+            port: 10542
             protocol: UDP
-          udp-10441:
-            port: 10441
+          udp-10543:
+            port: 10543
             protocol: UDP
-          udp-10442:
-            port: 10442
+          udp-10544:
+            port: 10544
             protocol: UDP
-          udp-10443:
-            port: 10443
+          udp-10545:
+            port: 10545
             protocol: UDP
-          udp-10444:
-            port: 10444
+          udp-10546:
+            port: 10546
             protocol: UDP
-          udp-10445:
-            port: 10445
+          udp-10547:
+            port: 10547
             protocol: UDP
-          udp-10446:
-            port: 10446
+          udp-10548:
+            port: 10548
             protocol: UDP
-          udp-10447:
-            port: 10447
+          udp-10549:
+            port: 10549
             protocol: UDP
-          udp-10448:
-            port: 10448
-            protocol: UDP
-          udp-10449:
-            port: 10449
-            protocol: UDP
-          udp-10450:
-            port: 10450
+          udp-10550:
+            port: 10550
             protocol: UDP

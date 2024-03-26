@@ -3,8 +3,7 @@ end_port = 10450
 ports = range(start_port, end_port + 1)
 
 with open("load-balancer.yaml", "w") as file:
-  file.write('''
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  file.write('''apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: home-assistant

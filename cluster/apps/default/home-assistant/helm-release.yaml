@@ -30,15 +30,21 @@ spec:
       config:
         enabled: true
         existingClaim: home-assistant-config
-      # deploy-key:
-      #   enabled: true
-      #   type: secret
-      #   name: git-ssh-keys
-      #   readOnly: true
-      #   defaultMode: 0600
-      #   subPath:
-      #     - path: GH_DEPLOY_KEY
-      #       mountPath: /root/.ssh/id_rsa
+      voice-assistant:
+        enabled: true
+        type: configMap
+        name: voice-assistant-config
+        mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
+        subPath: voice_assistant.py
+        # deploy-key:
+        #   enabled: true
+        #   type: secret
+        #   name: git-ssh-keys
+        #   readOnly: true
+        #   defaultMode: 0600
+        #   subPath:
+        #     - path: GH_DEPLOY_KEY
+        #       mountPath: /root/.ssh/id_rsa
     env:
       TZ: "Europe/Dublin"
     service:
@@ -46,6 +52,19 @@ spec:
         ports:
           http:
             port: 8123
+      nodeport:
+        type: NodePort
+        ports:
+          np-udp-30001:
+            port: 30001
+            targetPort: 30001
+            nodePort: 30001
+            protocol: UDP
+          np-udp-30002:
+            port: 30002
+            targetPort: 30002
+            nodePort: 30002
+            protocol: UDP
       lb:
         type: LoadBalancer
         loadBalancerIP: "${HASS_LB}"
@@ -57,10 +76,6 @@ spec:
             protocol: HTTP
           hue-lb:
             port: 80
-          udp-10500:
-            port: 10500
-            protocol: UDP
-
     probes:
       liveness:
         enabled: false
