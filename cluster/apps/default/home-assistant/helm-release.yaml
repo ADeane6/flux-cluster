@@ -52,18 +52,13 @@ spec:
         ports:
           http:
             port: 8123
-      nodeport:
+      voice-assistant:
         type: NodePort
         ports:
           np-udp-30001:
             port: 30001
             targetPort: 30001
             nodePort: 30001
-            protocol: UDP
-          np-udp-30002:
-            port: 30002
-            targetPort: 30002
-            nodePort: 30002
             protocol: UDP
       lb:
         type: LoadBalancer

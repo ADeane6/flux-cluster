@@ -1,8 +1,8 @@
-start_port = 10400
-end_port = 10450
+start_port = 30001
+end_port = 30051
 ports = range(start_port, end_port + 1)
 
-with open("load-balancer.yaml", "w") as file:
+with open("voice-assistant-ports.yaml", "w") as file:
   file.write('''apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -11,19 +11,13 @@ metadata:
 spec:
   values:
     service:
-      lb:
-        type: LoadBalancer
-        loadBalancerIP: "${HASS_LB}"
-        externalTrafficPolicy: Local
-        ports:
-          http-lb:
-            enabled: true
-            port: 8123
-            protocol: HTTP
-          hue-lb:
-            port: 80''')
+      voice-assistant:
+        type: NodePort
+        ports:''')
   for port in ports:
     file.write(f'''
-          udp-{port}:
+          np-udp-{port}:
             port: {port}
+            targetPort: {port}
+            nodePort: {port}
             protocol: UDP''')
