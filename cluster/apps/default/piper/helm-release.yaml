@@ -38,9 +38,6 @@ spec:
 
     service:
       main:
-        type: LoadBalancer
-        loadBalancerIP: "${PIPER_LB}"
-        externalTrafficPolicy: Local
         ports:
           http:
             enabled: true

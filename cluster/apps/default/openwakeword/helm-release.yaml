@@ -40,9 +40,6 @@ spec:
 
     service:
       main:
-        type: LoadBalancer
-        loadBalancerIP: "${OPENWAKEWORD_LB}"
-        externalTrafficPolicy: Local
         ports:
           http:
             enabled: true
