@@ -50,11 +50,11 @@ spec:
 
     resources:
       requests:
-        cpu: "0.5"
-        memory: 2Gi
-      limits:
         cpu: "2"
-        memory: 8Gi
+        memory: 4Gi
+      limits:
+        cpu: "4"
+        memory: 10Gi
 
     persistence:
       config:
