@@ -34,7 +34,7 @@ spec:
       tag: latest
     args:
       - --model
-      - medium-int8
+      - tiny-int8
       - --language
       - en
       - --beam
@@ -42,9 +42,6 @@ spec:
 
     service:
       main:
-        type: LoadBalancer
-        loadBalancerIP: "${WHISPER_LB}"
-        externalTrafficPolicy: Local
         ports:
           http:
             enabled: true
@@ -53,10 +50,11 @@ spec:
 
     resources:
       requests:
-        cpu: 4000m
-        memory: 10Gi
+        cpu: "0.5"
+        memory: 2Gi
       limits:
-        memory: 20Gi
+        cpu: "2"
+        memory: 8Gi
 
     persistence:
       config:
