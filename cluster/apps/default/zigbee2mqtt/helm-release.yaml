@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: ghcr.io/koenkk/zigbee2mqtt
-      tag: 1.33.2
+      tag: 1.36.1
     persistence:
       data:
         enabled: true
@@ -33,7 +33,6 @@ spec:
       TZ: "Europe/Dublin"
       ZIGBEE2MQTT_DATA: /data
       ZIGBEE2MQTT_CONFIG_HOMEASSISTANT: "true"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_channel: 15
       ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: "false"
       ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: "false"
       ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: debug # debug
