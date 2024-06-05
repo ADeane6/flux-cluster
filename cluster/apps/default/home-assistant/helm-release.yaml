@@ -30,12 +30,12 @@ spec:
       config:
         enabled: true
         existingClaim: home-assistant-config
-      voice-assistant:
-        enabled: true
-        type: configMap
-        name: voice-assistant-config
-        mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
-        subPath: voice_assistant.py
+      # voice-assistant:
+        # enabled: true
+        # type: configMap
+        # name: voice-assistant-config
+        # mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
+        # subPath: voice_assistant.py
         # deploy-key:
         #   enabled: true
         #   type: secret
