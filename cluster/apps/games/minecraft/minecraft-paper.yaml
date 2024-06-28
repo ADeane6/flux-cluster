@@ -11,7 +11,7 @@ spec:
     spec:
       # renovate: registryUrl=https://itzg.github.io/minecraft-server-charts/
       chart: minecraft
-      version: 4.4.0
+      version: 4.19.0
       sourceRef:
         kind: HelmRepository
         name: minecraft-server-charts
@@ -30,7 +30,7 @@ spec:
   values:
     image:
       repository: itzg/minecraft-server
-      tag: 2022.16.0-java17
+      tag: 2024.4.0-java21
     resources:
       limits:
         memory: 8Gi
@@ -47,25 +47,25 @@ spec:
     startupProbe:
       enabled: false
     extraEnv:
-      MODS: "https://github.com/spnda/BlockProt/releases/download/1.1.8/blockprot-spigot-1.1.8-all.jar, https://mc-plugins.net/_cdn/plugins/bukkit-spigot/dynmap_3.4-828.jar, https://mediafilez.forgecdn.net/files/3635/984/Dynmap-WorldGuard-1.4-beta-1.jar, https://github.com/EssentialsX/Essentials/releases/download/2.19.7/EssentialsX-2.19.7.jar, https://mediafilez.forgecdn.net/files/4162/203/worldedit-bukkit-7.2.13.jar, https://mediafilez.forgecdn.net/files/3903/109/worldguard-bukkit-7.0.8-beta-01-dist.jar, https://hub.bg-software.com/job/WildLoaders%20-%20Stable%20Builds/1/artifact/target/WildLoaders-2023.3.jar"
+      MODS: "https://github.com/spnda/BlockProt/releases/download/1.2.1/blockprot-spigot-1.2.1-all.jar, https://mc-plugins.net/_cdn/plugins/bukkit-spigot/dynmap_3.7-beta-1-917.jar, https://mediafilez.forgecdn.net/files/3635/984/Dynmap-WorldGuard-1.4-beta-1.jar, https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar, https://mediafilez.forgecdn.net/files/5443/866/worldedit-bukkit-7.3.4-beta-01.jar, https://mediafilez.forgecdn.net/files/5477/815/worldguard-bukkit-7.0.11-beta1-dist.jar, https://hub.bg-software.com/job/WildLoaders%20-%20Stable%20Builds/1/artifact/target/WildLoaders-2024.1.jar"
       SPIGET_RESOURCES: "23307,28140,32129,64346,60383"
       TZ: "Ireland/Dublin"
       ENABLE_ROLLING_LOGS: true
     persistence:
       dataDir:
         enabled: true
-        existingClaim: minecraft-paper-data
+        existingClaim: minecraft-paper-data-v2
     mcbackup:
       enabled: true
       persistence:
         backupDir:
           enabled: true
-          exisitingClaim: minecraft-paper-data-backup
+          exisitingClaim: minecraft-paper-data-backup-v2
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
     minecraftServer:
       eula: true
-      version: 1.19.2
+      version: 1.20.6
       type: PAPER
       difficulty: normal
       ops: "bbbiiittt"

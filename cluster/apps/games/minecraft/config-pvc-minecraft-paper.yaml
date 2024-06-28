@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minecraft-paper-data
+  name: minecraft-paper-data-v2
   namespace: games
 spec:
   accessModes:
@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minecraft-paper-data-backup
+  name: minecraft-paper-data-backup-v2
   namespace: games
 spec:
   accessModes:
