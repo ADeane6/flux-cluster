@@ -55,23 +55,23 @@ spec:
     persistence:
       dataDir:
         enabled: true
-        existingClaim: minecraft-paper-data-1.20.6
+        existingClaim: minecraft-paper-data-1.20.4
     mcbackup:
       enabled: true
       persistence:
         backupDir:
           enabled: true
-          exisitingClaim: minecraft-paper-data-backup-1.20.6
+          exisitingClaim: minecraft-paper-data-backup-1.20.4
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
     minecraftServer:
       eula: true
-      version: "1.20.6"
+      version: "1.20.4"
       type: PAPER
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
-      motd: "Minecraft 1.20.6 using Paper"
+      motd: "Minecraft 1.20.4 using Paper"
       viewDistance: 16
       forceReDownload: true
       memory: 4096M
