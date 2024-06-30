@@ -40,10 +40,16 @@ use exsitingClaim format
 # Update cluster from git
 flux reconcile source git flux-cluster
 
+# Reset retries
+flux reconcile hr <helmrelease-name> --namespace <namespace>
+
 # Debugging
 ## Shows all helm releases in flux
 flux get helmreleases -A
+## Check the HelmRelease status
+kubectl get helmrelease <helmrelease-name> -n <namespace> -o yaml
 ## logs of helm controller
+kubectl logs -n flux-system -l app=helm-controller
 kubectl logs -n flux-system $(kubectl get pod -n flux-system --field-selector=status.phase=Running |  awk '/helm-controller*/{print $1}') -f
 
 
