@@ -10,6 +10,7 @@ spec:
   chart:
     spec:
       # renovate: registryUrl=https://itzg.github.io/minecraft-server-charts/
+      # https://github.com/itzg/minecraft-server-charts/tree/master/charts/minecraft
       chart: minecraft
       version: 4.19.0
       sourceRef:
@@ -37,7 +38,7 @@ spec:
       requests:
         cpu: 1000m
         memory: 4Gi
-    securityContext:
+    podSecurityContext:
       runAsUser: 1000
       fsGroup: 1000
     livenessProbe:
