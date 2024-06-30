@@ -48,7 +48,7 @@ spec:
     startupProbe:
       enabled: false
     extraEnv:
-      MODS: "https://github.com/spnda/BlockProt/releases/download/1.2.1/blockprot-spigot-1.2.1-all.jar,https://mediafilez.forgecdn.net/files/5442/792/Dynmap-3.7-beta-6-spigot.jar,https://mediafilez.forgecdn.net/files/3635/984/Dynmap-WorldGuard-1.4-beta-1.jar,https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar,https://mediafilez.forgecdn.net/files/5443/866/worldedit-bukkit-7.3.4-beta-01.jar,https://mediafilez.forgecdn.net/files/5344/377/worldguard-bukkit-7.0.10-dist.jar,https://hub.bg-software.com/job/WildLoaders%20-%20Stable%20Builds/3/artifact/target/WildLoaders-2024.1.jar"
+      MODS: "https://github.com/spnda/BlockProt/releases/download/1.2.1/blockprot-spigot-1.2.1-all.jar,https://mediafilez.forgecdn.net/files/5442/792/Dynmap-3.7-beta-6-spigot.jar,https://mediafilez.forgecdn.net/files/3635/984/Dynmap-WorldGuard-1.4-beta-1.jar,https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar,https://mediafilez.forgecdn.net/files/5443/866/worldedit-bukkit-7.3.4-beta-01.jar,https://mediafilez.forgecdn.net/files/4675/318/worldguard-bukkit-7.0.9-dist.jar,https://hub.bg-software.com/job/WildLoaders%20-%20Stable%20Builds/3/artifact/target/WildLoaders-2024.1.jar"
       SPIGET_RESOURCES: "23307,28140,32129,64346,60383"
       TZ: "Ireland/Dublin"
       ENABLE_ROLLING_LOGS: true
