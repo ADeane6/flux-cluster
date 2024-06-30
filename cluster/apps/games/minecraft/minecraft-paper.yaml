@@ -66,12 +66,12 @@ spec:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
     minecraftServer:
       eula: true
-      version: 1.20.6
+      version: "1.21"
       type: PAPER
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
-      motd: "Minecraft 1.19.2 using Paper"
+      motd: "Minecraft 1.21 using Paper"
       worldSaveName: default
       viewDistance: 16
       forceReDownload: true
