@@ -55,13 +55,13 @@ spec:
     persistence:
       dataDir:
         enabled: true
-        existingClaim: minecraft-paper-data-v2
+        existingClaim: minecraft-paper-data-1.20.6
     mcbackup:
       enabled: true
       persistence:
         backupDir:
           enabled: true
-          exisitingClaim: minecraft-paper-data-backup-v2
+          exisitingClaim: minecraft-paper-data-backup-1.20.6
     serviceAnnotations:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_PAPER_LB}"
     minecraftServer:
@@ -72,7 +72,6 @@ spec:
       ops: "bbbiiittt"
       pvp: true
       motd: "Minecraft 1.20 using Paper"
-      worldSaveName: "1.20.6-default-2"
       viewDistance: 16
       forceReDownload: true
       memory: 4096M
