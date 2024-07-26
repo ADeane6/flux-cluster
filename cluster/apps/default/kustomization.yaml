@@ -13,3 +13,4 @@ resources:
   - ./piper
   - ./mosquitto
   - ./tautulli
+  - ./esphome
