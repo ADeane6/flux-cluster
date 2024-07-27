@@ -1,4 +1,3 @@
-
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -26,12 +25,26 @@ spec:
       repository: esphome/esphome
       tag: latest
     env:
-      TZ: 'UTC'
+      TZ: "UTC"
+      ESPHOME_DASHBOARD_USE_PING: "true"
     service:
       main:
         ports:
           http:
             port: 6052
+          mdns:
+            port: 5353
+            protocol: UDP
+      lb:
+        type: LoadBalancer
+        loadBalancerIP: "${ESPHOME_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          http-lb:
+            port: 6052
+          mdns-lb:
+            port: 5353
+            protocol: UDP
     ingress:
       main:
         enabled: true
