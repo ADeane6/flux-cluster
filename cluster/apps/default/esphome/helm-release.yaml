@@ -21,6 +21,7 @@ spec:
     remediation:
       retries: 5
   values:
+    hostNetwork: true
     image:
       repository: esphome/esphome
       tag: latest
