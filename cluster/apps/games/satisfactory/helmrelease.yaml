@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: wolveix/satisfactory-server
-      tag: v1.5.6@sha256:77bbd2eed50fbf49114dcce090a71a07933a7496787f07bfc947fb6fc5367efa
+      tag: latest
     env:
       DATA_FOLDER: "config"
       AUTOPAUSE: false
@@ -37,14 +37,10 @@ spec:
           http:
             enabled: false
             primary: false
-          query:
-            enabled: true
-            port: 15777
-            protocol: UDP
           beacon:
             enabled: true
-            port: 15000
-            protocol: UDP
+            port: 7777
+            protocol: TCP
           game:
             enabled: true
             port: 7777
@@ -52,11 +48,11 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: satisfactory-data
+        existingClaim: satisfactory-data-v1
         mountPath: /config
       server-cache:
         enabled: true
-        existingClaim: satisfactory-gamedata
+        existingClaim: satisfactory-gamedata-v1
         mountPath: /config/gamefiles
     probes:
       startup:
