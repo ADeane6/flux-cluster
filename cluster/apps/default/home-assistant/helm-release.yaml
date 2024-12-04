@@ -24,27 +24,27 @@ spec:
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
-      tag: 2024.7.0
+      tag: 2024.12.0
       # Versions: https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged
     persistence:
       config:
         enabled: true
         existingClaim: home-assistant-config
       # voice-assistant:
-        # enabled: true
-        # type: configMap
-        # name: voice-assistant-config
-        # mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
-        # subPath: voice_assistant.py
-        # deploy-key:
-        #   enabled: true
-        #   type: secret
-        #   name: git-ssh-keys
-        #   readOnly: true
-        #   defaultMode: 0600
-        #   subPath:
-        #     - path: GH_DEPLOY_KEY
-        #       mountPath: /root/.ssh/id_rsa
+      # enabled: true
+      # type: configMap
+      # name: voice-assistant-config
+      # mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
+      # subPath: voice_assistant.py
+      # deploy-key:
+      #   enabled: true
+      #   type: secret
+      #   name: git-ssh-keys
+      #   readOnly: true
+      #   defaultMode: 0600
+      #   subPath:
+      #     - path: GH_DEPLOY_KEY
+      #       mountPath: /root/.ssh/id_rsa
     env:
       TZ: "Europe/Dublin"
     service:
