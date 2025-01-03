@@ -57,6 +57,13 @@ spec:
         ports:
           http:
             port: 34400
+      lb:
+        type: LoadBalancer
+        loadBalancerIP: "${XTEVE_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          http-lb:
+            port: 34400
     ingress:
       app:
         enabled: true
