@@ -58,6 +58,7 @@ spec:
           http:
             port: 34400
       lb:
+        controller: xteve
         type: LoadBalancer
         loadBalancerIP: "${XTEVE_LB}"
         externalTrafficPolicy: Local
