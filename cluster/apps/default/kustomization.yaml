@@ -14,3 +14,4 @@ resources:
   - ./mosquitto
   - ./tautulli
   - ./esphome
+  - ./xteve
