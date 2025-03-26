@@ -16,3 +16,4 @@ resources:
   - ./esphome
   - ./xteve
   - ./overseerr
+  - ./maintainerr
