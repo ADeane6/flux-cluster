@@ -31,7 +31,7 @@ spec:
       main:
         ports:
           http:
-            port: 7000
+            port: 6246
     ingress:
       main:
         enabled: true
@@ -52,4 +52,4 @@ spec:
       config:
         enabled: true
         existingClaim: maintainerr-config
-        mountPath: /config
+        mountPath: /opt/data
