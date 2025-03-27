@@ -1,0 +1,64 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cloudflared
+  namespace: networking
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    controller:
+      replicas: 2
+      strategy: RollingUpdate
+
+    image:
+      repository: cloudflare/cloudflared
+      tag: 2025.1.0
+
+    env:
+      TZ: "Ireland/Dublin"
+    args:
+      - tunnel
+      - --config
+      - /etc/cloudflared/config.yaml
+      - run
+
+    service:
+      main:
+        enabled: false # Cloudflared doesn't need a service
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: cloudflared-config
+        mountPath: /etc/cloudflared/config.yaml
+        subPath: config.yaml
+      credentials:
+        enabled: true
+        type: secret
+        name: cloudflared-credentials
+        mountPath: /etc/cloudflared/credentials.json
+        subPath: credentials.json
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi

@@ -1,0 +1,10 @@
+tunnel: 4b4bf1d3-0af8-415f-8d85-82ebd5ae8790
+credentials-file: /etc/cloudflared/credentials.json
+ingress:
+  - hostname: radarr.tunnel.ashleydeane.me
+    service: http://radarr.home:7878
+  - hostname: sonarr.tunnel.ashleydeane.me
+    service: http://sonarr.home:8989
+  - hostname: truenas.tunnel.ashleydeane.me
+    service: http://freenas.home:80
+  - service: http_status:404
