@@ -1,4 +1,4 @@
-tunnel: 4b4bf1d3-0af8-415f-8d85-82ebd5ae8790
+tunnel: 644b31f5-319e-4f2d-a1bf-71acb67ee92f
 credentials-file: /etc/cloudflared/credentials.json
 ingress:
   - hostname: radarr.tunnel.ashleydeane.me
