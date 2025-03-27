@@ -13,7 +13,6 @@ resources:
   - ./piper
   - ./mosquitto
   - ./tautulli
-  - ./esphome
   - ./xteve
   - ./overseerr
   - ./maintainerr
