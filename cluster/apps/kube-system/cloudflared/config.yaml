@@ -5,4 +5,6 @@ ingress:
     service: http://radarr.home:7878
   - hostname: sonarr.ashleydeane.me
     service: http://sonarr.home:8989
+  - hostname: truenas.ashleydeane.me
+    service: http://truenas.home:8989
   - service: http_status:404
