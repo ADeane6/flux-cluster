@@ -25,7 +25,8 @@ spec:
     controller:
       replicas: 2
       strategy: RollingUpdate
-
+      podAnnotations:
+        configmap.reloader.stakater.com/reload: "cloudflared-config"
     image:
       repository: cloudflare/cloudflared
       tag: 2025.1.0
