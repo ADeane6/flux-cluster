@@ -7,6 +7,4 @@ ingress:
     service: http://sonarr.home:8989
   - hostname: truenas.ashleydeane.me
     service: http://freenas.home
-  - hostname: sonarr4.ashleydeane.me
-    service: http://10.0.0.142:8989
   - service: http_status:404
