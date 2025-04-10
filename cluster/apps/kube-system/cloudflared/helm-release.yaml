@@ -30,6 +30,9 @@ spec:
       repository: cloudflare/cloudflared
       tag: 2025.1.0
 
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "cloudflared-config"
+
     env:
       TZ: "Ireland/Dublin"
     args:
