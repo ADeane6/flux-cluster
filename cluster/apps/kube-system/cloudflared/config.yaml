@@ -1,8 +1,6 @@
 tunnel: 644b31f5-319e-4f2d-a1bf-71acb67ee92f
 credentials-file: /etc/cloudflared/credentials.json
 ingress:
-  - hostname: radarr.ashleydeane.me
-    service: http://radarr.home:7878
   - hostname: truenas.ashleydeane.me
     service: http://freenas.home
   - service: http_status:404
