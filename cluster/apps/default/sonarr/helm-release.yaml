@@ -34,6 +34,15 @@ spec:
         ports:
           http:
             port: 8989
+      lb:
+        type: LoadBalancer
+        loadBalancerIP: "${SONARR_LB}"
+        externalTrafficPolicy: Local
+        ports:
+          http-lb:
+            enabled: true
+            port: 8989
+            protocol: HTTP
     ingress:
       main:
         enabled: true
