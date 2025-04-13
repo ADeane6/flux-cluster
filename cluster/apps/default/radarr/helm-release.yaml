@@ -34,15 +34,15 @@ spec:
         ports:
           http:
             port: 7878
-      lb:
-        type: LoadBalancer
-        loadBalancerIP: "${RADARR_LB}"
-        externalTrafficPolicy: Local
-        ports:
-          http-lb:
-            enabled: true
-            port: 7878
-            protocol: HTTP
+      # lb:
+      #   type: LoadBalancer
+      #   loadBalancerIP: "${RADARR_LB}"
+      #   externalTrafficPolicy: Local
+      #   ports:
+      #     http-lb:
+      #       enabled: true
+      #       port: 7878
+      #       protocol: HTTP
     ingress:
       main:
         enabled: true
