@@ -3,8 +3,6 @@ credentials-file: /etc/cloudflared/credentials.json
 ingress:
   - hostname: radarr.ashleydeane.me
     service: http://radarr.home:7878
-  - hostname: sonarr.ashleydeane.me
-    service: http://sonarr.home:8989
   - hostname: truenas.ashleydeane.me
     service: http://freenas.home
   - service: http_status:404

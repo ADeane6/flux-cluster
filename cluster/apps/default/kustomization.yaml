@@ -16,3 +16,4 @@ resources:
   - ./xteve
   - ./overseerr
   - ./maintainerr
+  - ./sonarr
