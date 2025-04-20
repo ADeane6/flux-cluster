@@ -18,3 +18,4 @@ resources:
   - ./maintainerr
   - ./sonarr
   - ./radarr
+  - ./audiobookshelf
