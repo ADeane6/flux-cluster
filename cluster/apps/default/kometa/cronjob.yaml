@@ -31,6 +31,9 @@ spec:
                   sed "s|\${RADARR_API_KEY}|$KOMETA_RADARR_API_KEY|g" > /writable-config/config.yml
                   echo "Config file prepared with environment variables"
                   echo "--- BEGIN CONFIG FILE CONTENT ---"
+                  cat /readonly-config/config.yml
+                  echo "--- END CONFIG FILE CONTENT ---"
+                  echo "--- BEGIN CONFIG FILE CONTENT ---"
                   cat /writable-config/config.yml
                   echo "--- END CONFIG FILE CONTENT ---"
               env:
