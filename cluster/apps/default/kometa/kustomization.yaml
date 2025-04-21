@@ -10,7 +10,7 @@ configMapGenerator:
       - config/config.yml
   - name: kometa-libraries
     files:
-      - config/libraries/metadata.yml
-      - config/libraries/letterboxd_mi_amor.yml
+      - config/metadata.yml
+      - config/letterboxd_mi_amor.yml
 generatorOptions:
   disableNameSuffixHash: true
