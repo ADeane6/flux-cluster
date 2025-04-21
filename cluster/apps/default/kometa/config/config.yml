@@ -41,18 +41,21 @@ settings:
 
 plex:
   url: http://10.0.0.140:32400
+  token: ${PLEX_TOKEN}
   timeout: 60
   clean_bundles: false
   empty_trash: false
   optimize: false
 
 tmdb:
+  apikey: ${TMDB_API_KEY}
   language: en
   cache_expiration: 60
   region:
 
 radarr:
   url: http://radarr.default.svc.cluster.local:7878
+  token: ${RADARR_API_KEY}
   root_folder_path: /mnt/movies/media
   monitor: true
   availability: released

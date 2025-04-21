@@ -5,12 +5,12 @@ resources:
   - ./secret.sops.yaml
   - ./cronjob.yaml
 configMapGenerator:
-  - name: kometa-config
-    files:
-      - config/config.yml
   - name: kometa-libraries
     files:
       - config/metadata.yml
       - config/letterboxd_mi_amor.yml
+  - name: kometa-config
+    files:
+      - config/config.yml
 generatorOptions:
   disableNameSuffixHash: true

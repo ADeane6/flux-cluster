@@ -5,7 +5,7 @@ metadata:
   name: kometa-letterboxd-sync
   namespace: default
   annotations:
-    configmap.reloader.stakater.com/reload: "kometa-config"
+    configmap.reloader.stakater.com/reload: "kometa-config kometa-libraries"
 spec:
   schedule: "*/5 * * * *" # Every 5 minutes
   concurrencyPolicy: Forbid
@@ -18,10 +18,18 @@ spec:
       ttlSecondsAfterFinished: 14400
       template:
         spec:
-          containers:
-            - name: kometa
-              image: kometateam/kometa:latest
-              imagePullPolicy: IfNotPresent
+          initContainers:
+            - name: config-init
+              image: busybox
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  cat /readonly-config/config.yml | \
+                  sed "s|\${PLEX_TOKEN}|$KOMETA_PLEX_TOKEN|g" | \
+                  sed "s|\${TMDB_API_KEY}|$KOMETA_TMDB_API_KEY|g" | \
+                  sed "s|\${RADARR_API_KEY}|$KOMETA_RADARR_API_KEY|g" > /writable-config/config.yml
+                  echo "Config file prepared with environment variables"
               env:
                 - name: KOMETA_PLEX_TOKEN
                   valueFrom:
@@ -40,9 +48,17 @@ spec:
                       key: RADARR_API_KEY
               volumeMounts:
                 - name: config
+                  mountPath: /readonly-config
+                - name: writable-config
+                  mountPath: /writable-config
+          containers:
+            - name: kometa
+              image: kometateam/kometa:latest
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: writable-config
                   mountPath: /config/config.yml
                   subPath: config.yml
-                  readOnly: true
                 - name: libraries
                   mountPath: /config/libraries
                   readOnly: true
@@ -62,6 +78,8 @@ spec:
                 items:
                   - key: config.yml
                     path: config.yml
+            - name: writable-config
+              emptyDir: {}
             - name: libraries
               configMap:
                 name: kometa-libraries
