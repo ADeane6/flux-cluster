@@ -40,6 +40,8 @@ spec:
               volumeMounts:
                 - name: config
                   mountPath: /config
+                - name: logs
+                  mountPath: /config/logs
               command:
                 - /bin/sh
                 - -c
@@ -51,3 +53,5 @@ spec:
             - name: config
               configMap:
                 name: kometa-config
+            - name: logs
+              emptyDir: {}
