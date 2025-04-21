@@ -58,6 +58,10 @@ spec:
         enabled: true
         existingClaim: audiobookshelf-config
         mountPath: /config
+      metadata:
+        enabled: true
+        existingClaim: audiobookshelf-metadata
+        mountPath: /metadata
       books:
         enabled: true
         existingClaim: audiobookshelf-books
