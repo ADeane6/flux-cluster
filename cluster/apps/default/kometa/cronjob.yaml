@@ -39,8 +39,13 @@ spec:
                       name: kometa-secrets
                       key: RADARR_API_KEY
               volumeMounts:
-                - name: config
-                  mountPath: /config
+                - name: config-yml
+                  mountPath: /config/config.yml
+                  subPath: config.yml
+                  readOnly: true
+                - name: libraries
+                  mountPath: /config/libraries
+                  readOnly: true
                 - name: logs
                   mountPath: /config/logs
               command:
@@ -54,5 +59,11 @@ spec:
             - name: config
               configMap:
                 name: kometa-config
+                items:
+                  - key: config.yml
+                    path: config.yml
+            - name: libraries
+              configMap:
+                name: kometa-libraries
             - name: logs
               emptyDir: {}

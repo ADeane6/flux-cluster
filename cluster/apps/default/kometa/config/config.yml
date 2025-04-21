@@ -1,9 +1,9 @@
 libraries:
   Movies:
     metadata_path:
-      - file: config/metadata.yml
+      - file: config/libraries/metadata.yml
     collection_files:
-      - file: config/letterboxd_mi_amor.yml
+      - file: config/libraries/letterboxd_mi_amor.yml
 
 settings:
   cache: true
