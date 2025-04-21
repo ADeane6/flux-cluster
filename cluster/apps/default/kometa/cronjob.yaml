@@ -32,14 +32,6 @@ spec:
                     sed "s/TMDB_API_KEY/$KOMETA_TMDB_API_KEY/g" | \
                     sed "s/RADARR_API_KEY/$KOMETA_RADARR_API_KEY/g")
                   EOF
-
-                  echo "Config file prepared with environment variables"
-                  echo "--- BEGIN ORIGINAL CONFIG FILE CONTENT ---"
-                  cat /readonly-config/config.yml
-                  echo "--- END ORIGINAL CONFIG FILE CONTENT ---"
-                  echo "--- BEGIN MODIFIED CONFIG FILE CONTENT ---"
-                  cat /writable-config/config.yml
-                  echo "--- END MODIFIED CONFIG FILE CONTENT ---"
               env:
                 - name: KOMETA_PLEX_TOKEN
                   valueFrom:
@@ -79,10 +71,6 @@ spec:
                 - -c
               args:
                 - |
-                  echo "Verifying config file content:"
-                  cat /config/config.yml
-                  echo ""
-                  echo "Starting Kometa with config file..."
                   python3 kometa.py --read-only-config --config /config/config.yml --run
           restartPolicy: OnFailure
           volumes:

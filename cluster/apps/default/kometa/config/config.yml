@@ -1,5 +1,5 @@
 libraries:
-  Movies:
+  Films:
     metadata_path:
       - file: config/libraries/metadata.yml
     collection_files:
