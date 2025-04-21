@@ -26,9 +26,9 @@ spec:
                 - -c
                 - |
                   cat /readonly-config/config.yml | \
-                  sed "s|\${PLEX_TOKEN}|$KOMETA_PLEX_TOKEN|g" | \
-                  sed "s|\${TMDB_API_KEY}|$KOMETA_TMDB_API_KEY|g" | \
-                  sed "s|\${RADARR_API_KEY}|$KOMETA_RADARR_API_KEY|g" > /writable-config/config.yml
+                  sed "s/\${PLEX_TOKEN}/$KOMETA_PLEX_TOKEN/g" | \
+                  sed "s/\${TMDB_API_KEY}/$KOMETA_TMDB_API_KEY/g" | \
+                  sed "s/\${RADARR_API_KEY}/$KOMETA_RADARR_API_KEY/g" > /writable-config/config.yml
                   echo "Config file prepared with environment variables"
                   echo "--- BEGIN CONFIG FILE CONTENT ---"
                   cat /readonly-config/config.yml
