@@ -23,17 +23,17 @@ spec:
               image: kometateam/kometa:latest
               imagePullPolicy: IfNotPresent
               env:
-                - name: PLEX_TOKEN
+                - name: KOMETA_PLEX_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: kometa-secrets
                       key: PLEX_TOKEN
-                - name: TMDB_API_KEY
+                - name: KOMETA_TMDB_API_KEY
                   valueFrom:
                     secretKeyRef:
                       name: kometa-secrets
                       key: TMDB_API_KEY
-                - name: RADARR_API_KEY
+                - name: KOMETA_RADARR_API_KEY
                   valueFrom:
                     secretKeyRef:
                       name: kometa-secrets
