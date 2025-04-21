@@ -10,3 +10,12 @@ collections:
     item_radarr_tag: mi_amor
     summary: Movies from the "Mi Amor List" on Letterboxd
     sort_title: +01_Mi Amor List
+  Ashley's Watchlist:
+    letterboxd_list:
+      url: https://letterboxd.com/asbeane/watchlist/
+    radarr_add_missing: true
+    radarr_add_existing: true
+    radarr_upgrade_existing: true
+    radarr_tag: ashley_watchlist
+    item_radarr_tag: ashley_watchlist
+    summary: Movies from ashley's watchlist on Letterboxd
