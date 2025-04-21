@@ -13,6 +13,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 1200
       # Add TTL to keep jobs around for 4 hours (14400 seconds) after completion
       ttlSecondsAfterFinished: 14400
       template:
