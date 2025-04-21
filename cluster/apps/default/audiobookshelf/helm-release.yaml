@@ -34,7 +34,7 @@ spec:
         ports:
           http:
             enabled: true
-            port: 13378
+            port: 80
     ingress:
       main:
         enabled: true
