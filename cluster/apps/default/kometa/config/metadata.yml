@@ -1,0 +1,8 @@
+# Metadata configuration file
+templates:
+  mi_amor:
+    radarr_add: true
+    radarr_search: true
+    radarr_monitor: true
+    radarr_tag: mi_amor
+    item_radarr_tag: mi_amor

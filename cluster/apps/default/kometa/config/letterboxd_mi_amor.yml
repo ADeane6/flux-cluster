@@ -1,0 +1,13 @@
+# Letterboxd Mi Amor List Collection
+collections:
+  Mi Amor List:
+    template: { name: mi_amor }
+    letterboxd_list:
+      url: https://letterboxd.com/asbeane/list/mi-amor-list/
+    radarr_add_missing: true
+    radarr_add_existing: true
+    radarr_upgrade_existing: true
+    radarr_tag: mi_amor
+    item_radarr_tag: mi_amor
+    summary: Movies from the "Mi Amor List" on Letterboxd
+    sort_title: +01_Mi Amor List

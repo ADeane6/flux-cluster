@@ -20,3 +20,4 @@ resources:
   - ./radarr
   - ./audiobookshelf
   - ./readarr
+  - ./kometa

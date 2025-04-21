@@ -1,0 +1,51 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kometa-letterboxd-sync
+  namespace: default
+  annotations:
+    configmap.reloader.stakater.com/reload: "kometa-config"
+spec:
+  schedule: "0 */2 * * *" # Every 2 hours
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: kometa
+              image: kometateam/kometa:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PLEX_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: PLEX_TOKEN
+                - name: TMDB_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TMDB_API_KEY
+                - name: RADARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: RADARR_API_KEY
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  python3 kometa.py --config /config/config.yml --run
+          restartPolicy: OnFailure
+          volumes:
+            - name: config
+              configMap:
+                name: kometa-config

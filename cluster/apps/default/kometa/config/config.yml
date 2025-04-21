@@ -1,0 +1,69 @@
+libraries:
+  Movies:
+    metadata_path:
+      - file: config/metadata.yml
+    collection_files:
+      - file: config/letterboxd_mi_amor.yml
+
+settings:
+  cache: true
+  cache_expiration: 60
+  asset_directory: config/assets
+  asset_folders: true
+  asset_depth: 0
+  create_asset_folders: true
+  prioritize_assets: false
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_season_assets: false
+  show_missing_episode_assets: false
+  show_asset_not_needed: true
+  sync_mode: append
+  minimum_items: 1
+  default_collection_order: alpha
+  delete_below_minimum: false
+  delete_not_scheduled: false
+  run_again_delay: 2
+  missing_only_released: false
+  only_filter_missing: false
+  show_unmanaged: true
+  show_unconfigured: true
+  show_filtered: false
+  show_options: false
+  show_missing: true
+  save_report: false
+  tvdb_language: eng
+  ignore_ids:
+  ignore_imdb_ids:
+  playlist_sync_to_users: all
+  verify_ssl: true
+  check_nightly: false
+
+plex:
+  url: http://10.0.0.140:32400
+  token: ${PLEX_TOKEN}
+  timeout: 60
+  clean_bundles: false
+  empty_trash: false
+  optimize: false
+
+tmdb:
+  apikey: ${TMDB_API_KEY}
+  language: en
+  cache_expiration: 60
+  region:
+
+radarr:
+  url: http://radarr.default.svc.cluster.local:7878
+  token: ${RADARR_API_KEY}
+  root_folder_path: /mnt/movies/media
+  monitor: true
+  availability: released
+  quality_profile: "UHD Bluray + WEB"
+  tag: mi_amor
+  search: true
+  radarr_path: /mnt/movies/media
+  plex_path: /media/movies
+
+letterboxd:
+  username: asbeane
