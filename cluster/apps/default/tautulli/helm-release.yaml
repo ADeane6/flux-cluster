@@ -26,7 +26,7 @@ spec:
       repository: tautulli/tautulli
       tag: v2.13.4
     env:
-      TZ: 'Ireland/Dublin'
+      TZ: "Ireland/Dublin"
     service:
       main:
         ports:
@@ -36,6 +36,9 @@ spec:
       main:
         enabled: true
         annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-production"
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
         ingressClassName: "nginx"
         hosts:
           - host: &host "tautulli.${SECRET_DOMAIN}"
