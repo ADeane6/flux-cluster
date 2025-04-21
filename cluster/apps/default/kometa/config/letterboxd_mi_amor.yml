@@ -1,7 +1,6 @@
 # Letterboxd Mi Amor List Collection
 collections:
   Mi Amor List:
-    template: { name: mi_amor }
     letterboxd_list:
       url: https://letterboxd.com/asbeane/list/mi-amor-list/
     radarr_add_missing: true
