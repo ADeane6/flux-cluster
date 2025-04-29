@@ -27,7 +27,7 @@ spec:
       strategy: RollingUpdate
     image:
       repository: jacobalberty/unifi
-      tag: v7.2.95
+      tag: v7.5.176
     env:
       RUNAS_UID0: "false"
       UNIFI_UID: "999"
