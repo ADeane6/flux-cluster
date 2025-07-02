@@ -43,6 +43,9 @@ spec:
                     apiKeySecretRef:
                       name: cloudflare-api-key
                       key: api-key
+                    zoneIdSecretRef:
+                      name: cloudflare-api-key
+                      key: zone-id
                 selector:
                   dnsZones:
                     - ${SECRET_DOMAIN}
@@ -64,6 +67,9 @@ spec:
                     apiKeySecretRef:
                       name: cloudflare-api-key
                       key: api-key
+                    zoneIdSecretRef:
+                      name: cloudflare-api-key
+                      key: zone-id
                 selector:
                   dnsZones:
                     - ${SECRET_DOMAIN}
