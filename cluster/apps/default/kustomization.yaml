@@ -19,6 +19,4 @@ resources:
   - ./maintainerr
   - ./sonarr
   - ./radarr
-  - ./audiobookshelf
-  - ./readarr
   - ./kometa
