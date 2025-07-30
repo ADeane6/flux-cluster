@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: jackett
@@ -29,7 +29,7 @@ spec:
       replicas: 1
       strategy: RollingUpdate
     env:
-      TZ: 'Ireland/Dublin'
+      TZ: "Ireland/Dublin"
     service:
       main:
         ports:
