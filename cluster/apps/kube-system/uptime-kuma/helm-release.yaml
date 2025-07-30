@@ -46,7 +46,8 @@ spec:
       config:
         enabled: true
         existingClaim: uptime-kuma-config
-        mountPath: /app/data
+        globalMounts:
+          - path: /app/data
 
     ingress:
       main:
@@ -61,11 +62,11 @@ spec:
           hajimari.io/appName: Uptime-Kuma
         hosts:
           - host: &host "status.${SECRET_DOMAIN}"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - hosts:
               - *host
