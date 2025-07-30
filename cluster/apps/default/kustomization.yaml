@@ -14,7 +14,8 @@ resources:
   - ./piper
   - ./mosquitto
   - ./tautulli
-  - ./xteve
+  # Replace with threadfin when I have time: https://github.com/Threadfin/Threadfin
+  # - ./xteve
   - ./overseerr
   - ./maintainerr
   - ./sonarr
