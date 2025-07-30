@@ -12,3 +12,4 @@ resources:
   - ./metallb
   - ./metrics-server
   - ./reloader
+  - ./uptime-kuma

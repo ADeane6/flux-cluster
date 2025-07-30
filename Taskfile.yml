@@ -11,7 +11,7 @@ vars:
 dotenv: [".config.env"]
 
 env:
-  KUBECONFIG: "{{.PROJECT_DIR}}/provision/kubeconfig"
+  # KUBECONFIG: "{{.PROJECT_DIR}}/provision/kubeconfig"
 
 includes:
   ansible: .taskfiles/AnsibleTasks.yml
@@ -21,7 +21,6 @@ includes:
   sops: .taskfiles/SopsTasks.yml
 
 tasks:
-
   init:
     desc: Initialize workstation dependencies with Brew
     cmds:
