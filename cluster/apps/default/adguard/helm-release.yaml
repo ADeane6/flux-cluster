@@ -39,7 +39,7 @@ spec:
                 spec:
                   httpGet:
                     path: /
-                    port: 3000
+                    port: 80
                   initialDelaySeconds: 3
                   periodSeconds: 3
                   timeoutSeconds: 5
@@ -50,7 +50,7 @@ spec:
                 spec:
                   httpGet:
                     path: /
-                    port: 3000
+                    port: 80
                   initialDelaySeconds: 3
                   periodSeconds: 3
                   timeoutSeconds: 5
@@ -61,7 +61,7 @@ spec:
                 spec:
                   httpGet:
                     path: /
-                    port: 3000
+                    port: 80
                   initialDelaySeconds: 3
                   periodSeconds: 3
                   timeoutSeconds: 5
@@ -73,11 +73,6 @@ spec:
         loadBalancerIP: "${ADGUARD_LB_IP}"
         externalTrafficPolicy: Local
         ports:
-          initial:
-            enabled: true
-            port: 3000
-            protocol: TCP
-            targetPort: 3000
           http:
             enabled: true
             port: 80
