@@ -35,11 +35,22 @@ spec:
             probes:
               liveness:
                 enabled: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 3000
               readiness:
                 enabled: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 3000
               startup:
                 enabled: true
                 spec:
+                  httpGet:
+                    path: /
+                    port: 3000
                   failureThreshold: 30
                   periodSeconds: 5
     service:
@@ -49,7 +60,7 @@ spec:
           http:
             port: 3000
             protocol: HTTP
-      dns-tcp:
+      dns:
         controller: main
         type: LoadBalancer
         loadBalancerIP: "${ADGUARD_LB_IP}"
@@ -60,12 +71,6 @@ spec:
             port: 53
             protocol: TCP
             targetPort: 53
-      dns-udp:
-        controller: main
-        type: LoadBalancer
-        loadBalancerIP: "${ADGUARD_LB_IP}"
-        externalTrafficPolicy: Local
-        ports:
           dns-udp:
             enabled: true
             port: 53
