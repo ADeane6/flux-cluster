@@ -77,7 +77,8 @@ spec:
       version: "1.21.1"
       type: NEOFORGE
       neoforge_version: latest
-      modUrls: "https://cdn.modrinth.com/data/LNytGWDc/versions/tS7ygzAE/create-1.21.1-6.0.6.jar"
+      modUrls:
+        - "https://cdn.modrinth.com/data/LNytGWDc/versions/tS7ygzAE/create-1.21.1-6.0.6.jar"
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
