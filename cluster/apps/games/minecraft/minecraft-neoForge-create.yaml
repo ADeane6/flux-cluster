@@ -54,16 +54,16 @@ spec:
       dataDir:
         enabled: true
         existingClaim: minecraft-create-data-1.20.1
-    extraVolumes:
-      - volumeMounts:
-          - name: create-downloads-nfs
-            mountPath: /downloads
-            readOnly: false
-        volumes:
-          - name: create-downloads-nfs
-            nfs:
-              server: freenas.home
-              path: /mnt/all/games/minecraft/forge/downloads
+    # extraVolumes:
+    #   - volumeMounts:
+    #       - name: create-downloads-nfs
+    #         mountPath: /downloads
+    #         readOnly: false
+    #     volumes:
+    #       - name: create-downloads-nfs
+    #         nfs:
+    #           server: freenas.home
+    #           path: /mnt/all/games/minecraft/forge/downloads
     mcbackup:
       enabled: true
       persistence:
@@ -88,7 +88,8 @@ spec:
         apiKey:
           existingSecret: minecraft-rcon-credentials
           secretKey: CF_API_KEY
-        slug: create-ultimate-selection
+        slug: create
+        fileId: "6641603"
       rcon:
         enabled: true
         existingSecret: minecraft-rcon-credentials
