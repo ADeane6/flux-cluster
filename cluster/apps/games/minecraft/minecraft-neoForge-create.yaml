@@ -58,7 +58,7 @@ spec:
       - volumeMounts:
           - name: create-downloads-nfs
             mountPath: /downloads
-            readOnly: true
+            readOnly: false
         volumes:
           - name: create-downloads-nfs
             nfs:
