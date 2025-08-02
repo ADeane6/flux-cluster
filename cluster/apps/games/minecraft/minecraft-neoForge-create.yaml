@@ -82,8 +82,8 @@ spec:
         apiKey:
           existingSecret: minecraft-rcon-credentials
           secretKey: CF_API_KEY
-        slug: create-ultimate-selection
-        fileId: "6829587"
+        # slug: create-ultimate-selection
+        # fileId: "6836219"
       rcon:
         enabled: true
         existingSecret: minecraft-rcon-credentials
