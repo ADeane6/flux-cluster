@@ -6,7 +6,7 @@ metadata:
   namespace: games
 spec:
   capacity:
-    storage: 10Gb
+    storage: 10Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
@@ -26,4 +26,4 @@ spec:
   storageClassName: nfs
   resources:
     requests:
-      storage: 10Gb
+      storage: 10Gi
