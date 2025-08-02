@@ -54,16 +54,16 @@ spec:
       dataDir:
         enabled: true
         existingClaim: minecraft-create-data-1.20.1
-    extraVolumes:
-      - volumeMounts:
-          - name: create-downloads-nfs
-            mountPath: /downloads
-            readOnly: false
-        volumes:
-          - name: create-downloads-nfs
-            nfs:
-              server: freenas.home
-              path: /mnt/all/games/minecraft/forge/downloads
+    # extraVolumes:
+    #   - volumeMounts:
+    #       - name: create-downloads-nfs
+    #         mountPath: /downloads
+    #         readOnly: false
+    #     volumes:
+    #       - name: create-downloads-nfs
+    #         nfs:
+    #           server: freenas.home
+    #           path: /mnt/all/games/minecraft/forge/downloads
     mcbackup:
       enabled: true
       persistence:
@@ -74,8 +74,10 @@ spec:
       metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_CREATE_LB}"
     minecraftServer:
       eula: true
-      version: "1.20.1"
-      type: AUTO_CURSEFORGE
+      version: "1.21.1"
+      type: NEOFORGE
+      neoforge_version: latest
+      modUrls: "https://cdn.modrinth.com/data/LNytGWDc/versions/tS7ygzAE/create-1.21.1-6.0.6.jar"
       difficulty: normal
       ops: "bbbiiittt"
       pvp: true
