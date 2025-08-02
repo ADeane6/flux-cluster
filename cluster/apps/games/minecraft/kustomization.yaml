@@ -9,6 +9,6 @@ resources:
   - config-pvc-minecraft-create.yaml
   - minecraft-neoForge-create.yaml
   - config-pvc-minecraft-create-modpack.yaml
-  - minecraft-create-modkapck.yaml
+  - minecraft-create-modpack.yaml
   - rcon-web-admin-create.yaml
   - secret.sops.yaml
