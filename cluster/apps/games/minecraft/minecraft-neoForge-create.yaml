@@ -88,7 +88,8 @@ spec:
         apiKey:
           existingSecret: minecraft-rcon-credentials
           secretKey: CF_API_KEY
-        pageUrl: https://www.curseforge.com/minecraft/mc-mods/create/files/6641603
+        slug: create-essentials-and-performance
+        fileId: "6837102"
       rcon:
         enabled: true
         existingSecret: minecraft-rcon-credentials
