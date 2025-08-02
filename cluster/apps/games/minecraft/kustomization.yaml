@@ -8,5 +8,7 @@ resources:
   # might be handy to use freenas for the backup volume as well
   - config-pvc-minecraft-create.yaml
   - minecraft-neoForge-create.yaml
+  - config-pvc-minecraft-create-modpack.yaml
+  - minecraft-create-modkapck.yaml
   - rcon-web-admin-create.yaml
   - secret.sops.yaml

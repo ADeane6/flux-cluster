@@ -1,0 +1,136 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: minecraft-create-modpack
+  namespace: games
+spec:
+  interval: 15m
+  chart:
+    spec:
+      # renovate: registryUrl=https://itzg.github.io/minecraft-server-charts/
+      # https://github.com/itzg/minecraft-server-charts/tree/master/charts/minecraft
+      chart: minecraft
+      version: 4.26.4
+      sourceRef:
+        kind: HelmRepository
+        name: minecraft-server-charts
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: itzg/minecraft-server
+      tag: 2025.6.2
+    resources:
+      limits:
+        memory: 8Gi
+      requests:
+        cpu: 1000m
+        memory: 4Gi
+    podSecurityContext:
+      runAsUser: 1000
+      fsGroup: 1000
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    startupProbe:
+      enabled: false
+    extraEnv:
+      TZ: "Ireland/Dublin"
+      ENABLE_ROLLING_LOGS: true
+    persistence:
+      dataDir:
+        enabled: true
+        existingClaim: minecraft-create-modpack-data-1.20.1
+    extraVolumes:
+      - volumeMounts:
+          - name: create-downloads-nfs
+            mountPath: /downloads
+            readOnly: false
+        volumes:
+          - name: create-downloads-nfs
+            nfs:
+              server: freenas.home
+              path: /mnt/all/games/minecraft/forge/downloads
+    mcbackup:
+      enabled: true
+      persistence:
+        backupDir:
+          enabled: true
+          exisitingClaim: minecraft-create-modpack-data-backup-1.20.1
+    serviceAnnotations:
+      metallb.universe.tf/loadBalancerIPs: "${MINECRAFT_CREATE_MODPACK_LB}"
+    minecraftServer:
+      eula: true
+      version: "1.20.1"
+      type: AUTO_CURSEFORGE
+      difficulty: normal
+      ops: "bbbiiittt"
+      pvp: true
+      motd: "Minecraft 1.20.1 create using NeoForge"
+      viewDistance: 16
+      forceReDownload: true
+      memory: 4096M
+      jvmXXOpts: "-Xms4G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+      autoCurseForge:
+        apiKey:
+          existingSecret: minecraft-rcon-credentials
+          secretKey: CF_API_KEY
+        slug: create-ultimate-selection
+        fileId: "6836219"
+      rcon:
+        enabled: true
+        existingSecret: minecraft-rcon-credentials
+        serviceType: ClusterIP
+      serviceType: LoadBalancer
+      extraPorts:
+        - name: metrics
+          containerPort: 9225
+          protocol: TCP
+          service:
+            enabled: true
+            embedded: false
+            type: ClusterIP
+            port: 9225
+          ingress:
+            enabled: false
+        - name: map
+          containerPort: 8123
+          protocol: TCP
+          service:
+            enabled: true
+            embedded: false
+            type: ClusterIP
+            port: 8123
+          ingress:
+            ingressClassName: "nginx"
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-production
+              external-dns.home.arpa/enablerd: "true"
+              external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+              hajimari.io/appName: Minecraft-create
+              hajimari.io/enable: "true"
+              hajimari.io/icon: simple-icons:minecraft
+              hajimari.io/group: games
+            hosts:
+              - name: &host "create-modpack.${SECRET_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: "create-modpack.${SECRET_DOMAIN}"
+                hosts:
+                  - *host
