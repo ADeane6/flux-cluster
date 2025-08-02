@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: create-downloads
+  namespace: games
+spec:
+  capacity:
+    storage: 10Gb
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    server: freenas.home
+    path: /mnt/all/games/minecraft/forge/downloads
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: create-downloads
+  namespace: games
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 10Gb
