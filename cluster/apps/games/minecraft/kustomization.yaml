@@ -4,4 +4,7 @@ resources:
   - config-pvc-minecraft-paper.yaml
   - minecraft-paper.yaml
   - rcon-web-admin.yaml
+  - config-pvc-minecraft-create.yaml
+  - minecraft-neoForge-create.yaml
+  - rcon-web-admin-create.yaml
   - secret.sops.yaml
