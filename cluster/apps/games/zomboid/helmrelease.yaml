@@ -79,7 +79,7 @@ spec:
       game:
         enabled: true
         existingClaim: zomboid-game
-        mountPath: /home/steam/Steam
+        mountPath: /home/steam/Zomboid
     probes:
       startup:
         enabled: false
