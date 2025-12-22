@@ -26,6 +26,18 @@ spec:
       main:
         containers:
           main:
+            pod:
+              # Bypass CoreDNS to break circular dependency
+              # AdGuard will use upstream DNS directly instead of cluster DNS
+              dnsPolicy: "None"
+              dnsConfig:
+                nameservers:
+                  - 8.8.8.8
+                  - 1.1.1.1
+                searches:
+                  - default.svc.cluster.local
+                  - svc.cluster.local
+                  - cluster.local
             image:
               repository: adguard/adguardhome
               tag: latest
