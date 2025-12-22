@@ -1,0 +1,37 @@
+---
+# CoreDNS custom configuration to break circular dependency with AdGuard
+#
+# K3s coredns-custom ConfigMap supports two types of keys:
+#   - *.server  → Creates separate server blocks (for custom domains)
+#   - *.override → Overrides directives in the main .:53 server block
+#
+# This approach survives K3s reconciliation/upgrades
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  # Override the main forward directive to use upstream DNS directly
+  # This replaces "forward . /etc/resolv.conf" in the main .:53 block
+  # Breaking the circular dependency: CoreDNS → AdGuard → CoreDNS
+  forward.override: |
+    forward . 8.8.8.8 1.1.1.1
+
+  # Forward local domain queries to AdGuard for custom host resolution
+  # Note: The space-separated domains before :53 creates a server block
+  # that handles all listed domains
+  custom.server: |
+    home lan local:53 {
+        errors
+        cache 30
+        forward . 10.0.0.8
+    }
+
+  # Optional: Reverse DNS for 10.0.0.0/22 network (uncomment if needed)
+  # reverse.server: |
+  #   0.0.10.in-addr.arpa 1.0.10.in-addr.arpa 2.0.10.in-addr.arpa 3.0.10.in-addr.arpa:53 {
+  #       errors
+  #       cache 30
+  #       forward . 10.0.0.8
+  #   }

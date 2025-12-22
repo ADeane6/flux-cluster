@@ -6,6 +6,7 @@ resources:
   - ./cert-manager
   - ./cloudflare-ddns
   - ./cloudflared
+  - ./coredns-custom
   - ./external-dns
   - ./ingress-nginx
   - ./k8s-gateway
