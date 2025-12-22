@@ -1,0 +1,31 @@
+---
+# Server data: config, saves, logs, mods
+# This is where you can import your server save
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zomboid-data
+  namespace: games
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# Game files: Steam downloads, server binaries
+# These can be regenerated, but caching saves download time
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zomboid-game
+  namespace: games
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi

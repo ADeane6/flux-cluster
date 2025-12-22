@@ -1,0 +1,95 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app zomboid
+  namespace: games
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    image:
+      repository: renegademaster/zomboid-dedicated-server
+      tag: latest
+    env:
+      TZ: "Europe/Dublin"
+      # Game version: public, unstable (Build 42)
+      GAME_VERSION: "unstable"
+      # Server settings
+      SERVER_NAME: "meatGrinder"
+      MAX_PLAYERS: "16"
+      # Set to true for first run to accept Steam terms
+      STEAM_ACCEPT_TOS: "true"
+      # Memory settings - 4GB as requested
+      MAX_RAM: "4096m"
+      # Ports
+      DEFAULT_PORT: "16261"
+      DIRECT_PORT: "16262"
+      # RCON enabled since we have a password
+      RCON_ENABLED: "true"
+      RCON_PORT: "27015"
+      # Mods (comma-separated Workshop IDs, empty for vanilla)
+      MOD_IDS: ""
+      MOD_WORKSHOP_IDS: ""
+    # Secrets: SERVER_PASSWORD, RCON_PASSWORD, ADMIN_PASSWORD
+    envFrom:
+      - secretRef:
+          name: zomboid-secret
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: "${ZOMBOID_LB}"
+        ports:
+          http:
+            port: 80
+          game:
+            enabled: true
+            port: 16261
+            protocol: UDP
+          direct:
+            enabled: true
+            port: 16262
+            protocol: UDP
+          steam:
+            enabled: true
+            port: 27015
+            protocol: UDP
+    persistence:
+      # Server data (config, saves, logs)
+      data:
+        enabled: true
+        existingClaim: zomboid-data
+        mountPath: /home/steam/ZomboidDedicatedServer
+      # Game files (Steam downloads)
+      game:
+        enabled: true
+        existingClaim: zomboid-game
+        mountPath: /home/steam/Steam
+    probes:
+      startup:
+        enabled: false
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 4096Mi
+      limits:
+        memory: 6144Mi
