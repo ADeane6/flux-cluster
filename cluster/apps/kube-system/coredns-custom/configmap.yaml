@@ -21,8 +21,9 @@ data:
   # Forward local domain queries to AdGuard for custom host resolution
   # Note: The space-separated domains before :53 creates a server block
   # that handles all listed domains
+  # IMPORTANT: Don't include "local" - it conflicts with cluster.local!
   custom.server: |
-    home lan local:53 {
+    home lan:53 {
         errors
         cache 30
         forward . 10.0.0.8
