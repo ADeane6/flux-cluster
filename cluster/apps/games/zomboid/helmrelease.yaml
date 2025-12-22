@@ -30,7 +30,7 @@ spec:
       # Game version: public, unstable (Build 42)
       GAME_VERSION: "unstable"
       # Server settings
-      SERVER_NAME: "meatGrinder"
+      SERVER_NAME: "servertest"
       MAX_PLAYERS: "16"
       # Set to true for first run to accept Steam terms
       STEAM_ACCEPT_TOS: "true"
