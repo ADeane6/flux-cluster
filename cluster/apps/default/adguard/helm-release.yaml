@@ -32,6 +32,10 @@ spec:
             nameservers:
               - 8.8.8.8
               - 1.1.1.1
+            searches:
+              - default.svc.cluster.local
+              - svc.cluster.local
+              - cluster.local
         containers:
           main:
             image:
