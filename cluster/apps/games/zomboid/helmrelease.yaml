@@ -43,7 +43,7 @@ spec:
       RCON_ENABLED: "true"
       RCON_PORT: "27015"
       # Mods (comma-separated Workshop IDs, empty for vanilla)
-      MOD_NAMES: "SkillRecoveryJournal;ChuckleberryFinnAlertSystem;errorMagnifier"
+      MOD_NAMES: "\\SkillRecoveryJournal;\\ChuckleberryFinnAlertSystem;\\errorMagnifier;"
       MOD_WORKSHOP_IDS: "2503622437;3077900375;2896041179"
     # Secrets: SERVER_PASSWORD, RCON_PASSWORD, ADMIN_PASSWORD
     envFrom:
