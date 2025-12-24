@@ -1,0 +1,45 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rcon-web-pz
+  namespace: games
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://itzg.github.io/minecraft-server-charts/
+      chart: rcon-web-admin
+      version: 1.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: minecraft-server-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 512Mi
+        cpu: 400m
+    ingress:
+      enabled: true
+      host: &host "rconpz.${SECRET_DOMAIN}"
+      tls:
+        - secretName: "rcon-pz-server-tls"
+          hosts:
+            - *host
+    rconWeb:
+      game: other
+      serverName: zomboid
+      rconPort: 27015
+      isAdmin: true
+      passwordExistingSecret: zomboid-secret
+      passwordKey: RCON_PASSWORD
+      rconHost: zomboid.games.svc.cluster.local
+      rconPasswordExistingSecret: zomboid-secret
+      rconPasswordKey: RCON_PASSWORD
+    extraEnv:
+      TZ: "Ireland/Dublin"
