@@ -2,8 +2,8 @@
 collections:
   Movie Watchlist:
     trakt_watchlist:
-      username: asbeane
-      sort_by: rank
+      - asbeane
+    collection_order: custom
     radarr_add_missing: true
     radarr_add_existing: true
     radarr_upgrade_existing: true
@@ -21,8 +21,8 @@ collections:
     radarr_add_missing: true
     radarr_add_existing: true
     radarr_upgrade_existing: true
-    radarr_tag: me_ciara
-    item_radarr_tag: me_ciara
+    radarr_tag: me-ciara
+    item_radarr_tag: me-ciara
     summary: Movies from the "Ashley & Ciara" list on Trakt
     sort_title: +02_Ashley & Ciara Movies
     visible_home: true

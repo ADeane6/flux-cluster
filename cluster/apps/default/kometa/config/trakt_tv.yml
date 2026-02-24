@@ -2,8 +2,8 @@
 collections:
   TV Watchlist:
     trakt_watchlist:
-      username: asbeane
-      sort_by: rank
+      - asbeane
+    collection_order: custom
     sonarr_add_missing: true
     sonarr_add_existing: true
     sonarr_upgrade_existing: true
@@ -21,8 +21,8 @@ collections:
     sonarr_add_missing: true
     sonarr_add_existing: true
     sonarr_upgrade_existing: true
-    sonarr_tag: me_ciara
-    item_sonarr_tag: me_ciara
+    sonarr_tag: me-ciara
+    item_sonarr_tag: me-ciara
     summary: TV shows from the "Ashley & Ciara" list on Trakt
     sort_title: +02_Ashley & Ciara TV Shows
     visible_home: true
