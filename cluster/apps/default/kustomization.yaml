@@ -22,4 +22,5 @@ resources:
   - ./radarr
   - ./kometa
   - ./plex-trakt-sync
+  - ./notifiarr
   - ./adguard

@@ -36,7 +36,8 @@ spec:
                     sed "s/TRAKT_CLIENT_SECRET/$KOMETA_TRAKT_CLIENT_SECRET/g" | \
                     sed "s/TRAKT_ACCESS_TOKEN/$KOMETA_TRAKT_ACCESS_TOKEN/g" | \
                     sed "s/TRAKT_REFRESH_TOKEN/$KOMETA_TRAKT_REFRESH_TOKEN/g" | \
-                    sed "s/TRAKT_CREATED_AT/$KOMETA_TRAKT_CREATED_AT/g")
+                    sed "s/TRAKT_CREATED_AT/$KOMETA_TRAKT_CREATED_AT/g" | \
+                    sed "s/NOTIFIARR_API_KEY/$KOMETA_NOTIFIARR_API_KEY/g")
                   EOF
               env:
                 - name: KOMETA_PLEX_TOKEN
@@ -84,6 +85,11 @@ spec:
                     secretKeyRef:
                       name: kometa-secrets
                       key: TRAKT_CREATED_AT
+                - name: KOMETA_NOTIFIARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: NOTIFIARR_API_KEY
               volumeMounts:
                 - name: config
                   mountPath: /readonly-config
