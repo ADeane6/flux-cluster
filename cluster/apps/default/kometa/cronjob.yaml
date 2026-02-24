@@ -7,7 +7,7 @@ metadata:
   annotations:
     configmap.reloader.stakater.com/reload: "kometa-config kometa-libraries"
 spec:
-  schedule: "*/5 * * * *" # Every 5 minutes
+  schedule: "*/10 * * * *" # Every 10 minutes
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -25,20 +25,18 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  # Create a new config file with variables replaced
-                  cat > /writable-config/config.yml << EOF
-                  $(cat /readonly-config/config.yml | \
-                    sed "s/PLEX_TOKEN/$KOMETA_PLEX_TOKEN/g" | \
-                    sed "s/TMDB_API_KEY/$KOMETA_TMDB_API_KEY/g" | \
-                    sed "s/RADARR_API_KEY/$KOMETA_RADARR_API_KEY/g" | \
-                    sed "s/SONARR_API_KEY/$KOMETA_SONARR_API_KEY/g" | \
-                    sed "s/TRAKT_CLIENT_ID/$KOMETA_TRAKT_CLIENT_ID/g" | \
-                    sed "s/TRAKT_CLIENT_SECRET/$KOMETA_TRAKT_CLIENT_SECRET/g" | \
-                    sed "s/TRAKT_ACCESS_TOKEN/$KOMETA_TRAKT_ACCESS_TOKEN/g" | \
-                    sed "s/TRAKT_REFRESH_TOKEN/$KOMETA_TRAKT_REFRESH_TOKEN/g" | \
-                    sed "s/TRAKT_CREATED_AT/$KOMETA_TRAKT_CREATED_AT/g" | \
-                    sed "s/NOTIFIARR_API_KEY/$KOMETA_NOTIFIARR_API_KEY/g")
-                  EOF
+                  # Create config with variables replaced using | as delimiter to avoid issues with special chars
+                  sed -e "s|PLEX_TOKEN|$KOMETA_PLEX_TOKEN|g" \
+                      -e "s|TMDB_API_KEY|$KOMETA_TMDB_API_KEY|g" \
+                      -e "s|RADARR_API_KEY|$KOMETA_RADARR_API_KEY|g" \
+                      -e "s|SONARR_API_KEY|$KOMETA_SONARR_API_KEY|g" \
+                      -e "s|TRAKT_CLIENT_ID|$KOMETA_TRAKT_CLIENT_ID|g" \
+                      -e "s|TRAKT_CLIENT_SECRET|$KOMETA_TRAKT_CLIENT_SECRET|g" \
+                      -e "s|TRAKT_ACCESS_TOKEN|$KOMETA_TRAKT_ACCESS_TOKEN|g" \
+                      -e "s|TRAKT_REFRESH_TOKEN|$KOMETA_TRAKT_REFRESH_TOKEN|g" \
+                      -e "s|TRAKT_CREATED_AT|$KOMETA_TRAKT_CREATED_AT|g" \
+                      -e "s|NOTIFIARR_API_KEY|$KOMETA_NOTIFIARR_API_KEY|g" \
+                      /readonly-config/config.yml > /writable-config/config.yml
               env:
                 - name: KOMETA_PLEX_TOKEN
                   valueFrom:

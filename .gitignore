@@ -20,3 +20,4 @@ megalinter-reports
 cluster/testing
 local-apps
 export-configmap-envs.sh
+logs/
