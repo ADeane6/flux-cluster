@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: kometa-letterboxd-sync
+  name: kometa-trakt-sync
   namespace: default
   annotations:
     configmap.reloader.stakater.com/reload: "kometa-config kometa-libraries"
@@ -30,7 +30,13 @@ spec:
                   $(cat /readonly-config/config.yml | \
                     sed "s/PLEX_TOKEN/$KOMETA_PLEX_TOKEN/g" | \
                     sed "s/TMDB_API_KEY/$KOMETA_TMDB_API_KEY/g" | \
-                    sed "s/RADARR_API_KEY/$KOMETA_RADARR_API_KEY/g")
+                    sed "s/RADARR_API_KEY/$KOMETA_RADARR_API_KEY/g" | \
+                    sed "s/SONARR_API_KEY/$KOMETA_SONARR_API_KEY/g" | \
+                    sed "s/TRAKT_CLIENT_ID/$KOMETA_TRAKT_CLIENT_ID/g" | \
+                    sed "s/TRAKT_CLIENT_SECRET/$KOMETA_TRAKT_CLIENT_SECRET/g" | \
+                    sed "s/TRAKT_ACCESS_TOKEN/$KOMETA_TRAKT_ACCESS_TOKEN/g" | \
+                    sed "s/TRAKT_REFRESH_TOKEN/$KOMETA_TRAKT_REFRESH_TOKEN/g" | \
+                    sed "s/TRAKT_CREATED_AT/$KOMETA_TRAKT_CREATED_AT/g")
                   EOF
               env:
                 - name: KOMETA_PLEX_TOKEN
@@ -48,6 +54,36 @@ spec:
                     secretKeyRef:
                       name: kometa-secrets
                       key: RADARR_API_KEY
+                - name: KOMETA_SONARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: SONARR_API_KEY
+                - name: KOMETA_TRAKT_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TRAKT_CLIENT_ID
+                - name: KOMETA_TRAKT_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TRAKT_CLIENT_SECRET
+                - name: KOMETA_TRAKT_ACCESS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TRAKT_ACCESS_TOKEN
+                - name: KOMETA_TRAKT_REFRESH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TRAKT_REFRESH_TOKEN
+                - name: KOMETA_TRAKT_CREATED_AT
+                  valueFrom:
+                    secretKeyRef:
+                      name: kometa-secrets
+                      key: TRAKT_CREATED_AT
               volumeMounts:
                 - name: config
                   mountPath: /readonly-config

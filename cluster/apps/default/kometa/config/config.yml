@@ -1,9 +1,10 @@
 libraries:
-  Films:
-    metadata_path:
-      - file: config/libraries/metadata.yml
+  Movies:
     collection_files:
-      - file: config/libraries/letterboxd_mi_amor.yml
+      - file: config/libraries/trakt_movies.yml
+  TV Shows:
+    collection_files:
+      - file: config/libraries/trakt_tv.yml
 
 settings:
   cache: true
@@ -18,7 +19,7 @@ settings:
   show_missing_season_assets: false
   show_missing_episode_assets: false
   show_asset_not_needed: true
-  sync_mode: append
+  sync_mode: sync
   minimum_items: 1
   default_collection_order: alpha
   delete_below_minimum: false
@@ -59,11 +60,30 @@ radarr:
   root_folder_path: /mnt/movies/media
   monitor: true
   availability: released
-  quality_profile: "UHD Bluray + WEB"
-  tag: mi_amor
+  quality_profile: "HD Bluray + WEB"
   search: true
   radarr_path: /mnt/movies/media
   plex_path: /media/movies
 
-letterboxd:
-  username: asbeane
+sonarr:
+  url: http://sonarr.default.svc.cluster.local:8989
+  token: SONARR_API_KEY
+  root_folder_path: /mnt/tv_shows/media
+  monitor: all
+  quality_profile: "WEB-1080p"
+  series_type: standard
+  season_folder: true
+  search: true
+  sonarr_path: /mnt/tv_shows/media
+  plex_path: /media/tv_shows
+
+trakt:
+  client_id: TRAKT_CLIENT_ID
+  client_secret: TRAKT_CLIENT_SECRET
+  authorization:
+    access_token: TRAKT_ACCESS_TOKEN
+    token_type: Bearer
+    expires_in: 7776000
+    refresh_token: TRAKT_REFRESH_TOKEN
+    scope: public
+    created_at: TRAKT_CREATED_AT

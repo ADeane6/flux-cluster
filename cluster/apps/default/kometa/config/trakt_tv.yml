@@ -1,0 +1,31 @@
+# Trakt TV Collections
+collections:
+  TV Watchlist:
+    trakt_watchlist:
+      username: asbeane
+      sort_by: rank
+    sonarr_add_missing: true
+    sonarr_add_existing: true
+    sonarr_upgrade_existing: true
+    sonarr_tag: watchlist
+    item_sonarr_tag: watchlist
+    summary: TV shows from my Trakt watchlist
+    sort_title: +01_TV Watchlist
+    visible_home: true
+    visible_shared: true
+    visible_library: true
+    sync_mode: sync
+  Ashley & Ciara TV Shows:
+    trakt_list:
+      - https://trakt.tv/users/asbeane/lists/me-ciara
+    sonarr_add_missing: true
+    sonarr_add_existing: true
+    sonarr_upgrade_existing: true
+    sonarr_tag: me_ciara
+    item_sonarr_tag: me_ciara
+    summary: TV shows from the "Ashley & Ciara" list on Trakt
+    sort_title: +02_Ashley & Ciara TV Shows
+    visible_home: true
+    visible_shared: true
+    visible_library: true
+    sync_mode: sync

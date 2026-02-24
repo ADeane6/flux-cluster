@@ -5,12 +5,11 @@ resources:
   - ./secret.sops.yaml
   - ./cronjob.yaml
 configMapGenerator:
-  - name: kometa-libraries
-    files:
-      - config/trakt_movies.yml
-      - config/trakt_tv.yml
-  - name: kometa-config
+  - name: plex-trakt-sync-config
     files:
       - config/config.yml
+      - config/.pytrakt.json
+      - config/servers.yml
+      - config/.env
 generatorOptions:
   disableNameSuffixHash: true

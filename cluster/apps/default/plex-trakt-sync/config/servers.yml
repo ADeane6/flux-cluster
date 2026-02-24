@@ -1,0 +1,13 @@
+servers:
+  default:
+    token: null
+    urls:
+    - null
+    id: null
+    config: null
+  Plexus 2.0:
+    token: PLEX_TOKEN
+    urls:
+    - http://10.0.0.140:32400
+    id: bf961836f406392104915339a3f1cf8d1ffe1e43
+    config: null

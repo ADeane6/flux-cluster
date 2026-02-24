@@ -1,0 +1,90 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: plex-trakt-sync
+  namespace: default
+  annotations:
+    configmap.reloader.stakater.com/reload: "plex-trakt-sync-config"
+spec:
+  schedule: "*/15 * * * *" # Every 15 minutes
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      ttlSecondsAfterFinished: 14400
+      template:
+        spec:
+          initContainers:
+            - name: config-init
+              image: busybox
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mkdir -p /writable-config
+                  # Copy and inject secrets into servers.yml
+                  sed "s/PLEX_TOKEN/$PTS_PLEX_TOKEN/g" /readonly-config/servers.yml > /writable-config/servers.yml
+                  # Copy and inject secrets into .pytrakt.json
+                  cat /readonly-config/.pytrakt.json | \
+                    sed "s/TRAKT_CLIENT_ID/$PTS_TRAKT_CLIENT_ID/g" | \
+                    sed "s/TRAKT_CLIENT_SECRET/$PTS_TRAKT_CLIENT_SECRET/g" | \
+                    sed "s/TRAKT_OAUTH_TOKEN/$PTS_TRAKT_OAUTH_TOKEN/g" | \
+                    sed "s/TRAKT_OAUTH_REFRESH/$PTS_TRAKT_OAUTH_REFRESH/g" | \
+                    sed "s/TRAKT_OAUTH_EXPIRES_AT/$PTS_TRAKT_OAUTH_EXPIRES_AT/g" \
+                    > /writable-config/.pytrakt.json
+                  # Copy config.yml and .env as-is
+                  cp /readonly-config/config.yml /writable-config/config.yml
+                  cp /readonly-config/.env /writable-config/.env
+              env:
+                - name: PTS_PLEX_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: PLEX_TOKEN
+                - name: PTS_TRAKT_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: TRAKT_CLIENT_ID
+                - name: PTS_TRAKT_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: TRAKT_CLIENT_SECRET
+                - name: PTS_TRAKT_OAUTH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: TRAKT_OAUTH_TOKEN
+                - name: PTS_TRAKT_OAUTH_REFRESH
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: TRAKT_OAUTH_REFRESH
+                - name: PTS_TRAKT_OAUTH_EXPIRES_AT
+                  valueFrom:
+                    secretKeyRef:
+                      name: plex-trakt-sync-secrets
+                      key: TRAKT_OAUTH_EXPIRES_AT
+              volumeMounts:
+                - name: readonly-config
+                  mountPath: /readonly-config
+                - name: writable-config
+                  mountPath: /writable-config
+          containers:
+            - name: plex-trakt-sync
+              image: ghcr.io/taxel/plextraktsync:latest
+              command: ["plextraktsync", "sync"]
+              volumeMounts:
+                - name: writable-config
+                  mountPath: /app/config
+          restartPolicy: OnFailure
+          volumes:
+            - name: readonly-config
+              configMap:
+                name: plex-trakt-sync-config
+            - name: writable-config
+              emptyDir: {}
