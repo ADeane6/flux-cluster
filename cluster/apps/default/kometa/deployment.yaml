@@ -105,6 +105,11 @@ spec:
         - name: kometa
           image: kometateam/kometa:latest
           imagePullPolicy: IfNotPresent
+          command:
+            - python3
+            - kometa.py
+            - --config
+            - /config/config.yml
           volumeMounts:
             - name: config
               mountPath: /config
