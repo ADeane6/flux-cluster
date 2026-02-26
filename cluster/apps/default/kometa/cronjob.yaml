@@ -5,7 +5,7 @@ metadata:
   name: kometa-trakt-sync
   namespace: default
 spec:
-  schedule: "*/30 * * * *"  # Every 30 minutes
+  schedule: "*/30 * * * *" # Every 30 minutes
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -25,7 +25,7 @@ spec:
                   # Always copy libraries (they may be updated)
                   mkdir -p /config/libraries
                   cp /libraries/* /config/libraries/
-                  
+
                   # Only create config.yml if it doesn't exist (preserves token updates)
                   if [ ! -f /config/config.yml ]; then
                     echo "First run - creating initial config"
