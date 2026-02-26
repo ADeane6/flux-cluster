@@ -4,7 +4,7 @@ namespace: default
 resources:
   - ./secret.sops.yaml
   - ./config-pvc.yaml
-  - ./deployment.yaml
+  - ./cronjob.yaml
 configMapGenerator:
   - name: kometa-libraries
     files:
