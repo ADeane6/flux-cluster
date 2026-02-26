@@ -80,6 +80,7 @@ sonarr:
 trakt:
   client_id: TRAKT_CLIENT_ID
   client_secret: TRAKT_CLIENT_SECRET
+  force_refresh: false
   authorization:
     access_token: TRAKT_ACCESS_TOKEN
     token_type: Bearer

@@ -112,7 +112,7 @@ spec:
                 - -c
               args:
                 - |
-                  python3 kometa.py --read-only-config --config /config/config.yml --run --debug --trace
+                  python3 kometa.py --read-only-config --config /config/config.yml --run
           restartPolicy: OnFailure
           volumes:
             - name: config
