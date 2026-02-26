@@ -3,7 +3,8 @@ kind: Kustomization
 namespace: default
 resources:
   - ./secret.sops.yaml
-  - ./cronjob.yaml
+  - ./config-pvc.yaml
+  - ./deployment.yaml
 configMapGenerator:
   - name: kometa-libraries
     files:

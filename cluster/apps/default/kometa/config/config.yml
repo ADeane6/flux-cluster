@@ -6,6 +6,9 @@ libraries:
     collection_files:
       - file: config/libraries/trakt_tv.yml
 
+schedule:
+  run_times_every: 60  # Run every 60 minutes
+
 settings:
   cache: true
   cache_expiration: 60

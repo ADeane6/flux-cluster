@@ -1,0 +1,126 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kometa
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kometa
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kometa
+    spec:
+      initContainers:
+        - name: config-init
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Always copy libraries (they don't contain secrets and may be updated)
+              cp -r /libraries/* /config/libraries/ 2>/dev/null || mkdir -p /config/libraries && cp -r /libraries/* /config/libraries/
+              
+              # Only create config.yml if it doesn't exist (first run)
+              if [ ! -f /config/config.yml ]; then
+                echo "First run - creating initial config (will need manual --trakt-auth)"
+                sed -e "s|PLEX_TOKEN|$KOMETA_PLEX_TOKEN|g" \
+                    -e "s|TMDB_API_KEY|$KOMETA_TMDB_API_KEY|g" \
+                    -e "s|RADARR_API_KEY|$KOMETA_RADARR_API_KEY|g" \
+                    -e "s|SONARR_API_KEY|$KOMETA_SONARR_API_KEY|g" \
+                    -e "s|TRAKT_CLIENT_ID|$KOMETA_TRAKT_CLIENT_ID|g" \
+                    -e "s|TRAKT_CLIENT_SECRET|$KOMETA_TRAKT_CLIENT_SECRET|g" \
+                    -e "s|TRAKT_ACCESS_TOKEN|$KOMETA_TRAKT_ACCESS_TOKEN|g" \
+                    -e "s|TRAKT_REFRESH_TOKEN|$KOMETA_TRAKT_REFRESH_TOKEN|g" \
+                    -e "s|TRAKT_CREATED_AT|$KOMETA_TRAKT_CREATED_AT|g" \
+                    -e "s|NOTIFIARR_API_KEY|$KOMETA_NOTIFIARR_API_KEY|g" \
+                    /readonly-config/config.yml > /config/config.yml
+              else
+                echo "Config exists - using persisted config"
+              fi
+          env:
+            - name: KOMETA_PLEX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: PLEX_TOKEN
+            - name: KOMETA_TMDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TMDB_API_KEY
+            - name: KOMETA_RADARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: RADARR_API_KEY
+            - name: KOMETA_SONARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: SONARR_API_KEY
+            - name: KOMETA_TRAKT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TRAKT_CLIENT_ID
+            - name: KOMETA_TRAKT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TRAKT_CLIENT_SECRET
+            - name: KOMETA_TRAKT_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TRAKT_ACCESS_TOKEN
+            - name: KOMETA_TRAKT_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TRAKT_REFRESH_TOKEN
+            - name: KOMETA_TRAKT_CREATED_AT
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: TRAKT_CREATED_AT
+            - name: KOMETA_NOTIFIARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kometa-secrets
+                  key: NOTIFIARR_API_KEY
+          volumeMounts:
+            - name: readonly-config
+              mountPath: /readonly-config
+            - name: config
+              mountPath: /config
+            - name: libraries
+              mountPath: /libraries
+      containers:
+        - name: kometa
+          image: kometateam/kometa:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          env:
+            - name: TZ
+              value: "Europe/Dublin"
+      volumes:
+        - name: readonly-config
+          configMap:
+            name: kometa-config
+            items:
+              - key: config.yml
+                path: config.yml
+        - name: config
+          persistentVolumeClaim:
+            claimName: kometa-config
+        - name: libraries
+          configMap:
+            name: kometa-libraries
