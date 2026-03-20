@@ -36,15 +36,15 @@ spec:
       # name: voice-assistant-config
       # mountPath: /usr/src/homeassistant/homeassistant/components/esphome/voice_assistant.py
       # subPath: voice_assistant.py
-      # deploy-key:
-      #   enabled: true
-      #   type: secret
-      #   name: git-ssh-keys
-      #   readOnly: true
-      #   defaultMode: 0600
-      #   subPath:
-      #     - path: GH_DEPLOY_KEY
-      #       mountPath: /root/.ssh/id_rsa
+      deploy-key:
+        enabled: true
+        type: secret
+        name: git-ssh-keys
+        readOnly: true
+        defaultMode: 0600
+        subPath:
+          - path: id_rsa
+            mountPath: /root/.ssh/id_rsa
     env:
       TZ: "Europe/Dublin"
     service:
@@ -111,11 +111,11 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /config
-        # git:
-        #   # -- Existing secret containing SSH private key
-        #   # The chart expects it to be present under the `id_rsa` key.
-        #   # https://github.com/bjw-s/helm-charts/blob/ae4233c77f91d15a93fd20a2245113acf9254b54/charts/library/common/templates/addons/code-server/_container.tpl#L37
-        #   deployKeySecret: git-ssh-keys
+        git:
+          # -- Existing secret containing SSH private key
+          # The chart expects it to be present under the `id_rsa` key.
+          # https://github.com/bjw-s/helm-charts/blob/ae4233c77f91d15a93fd20a2245113acf9254b54/charts/library/common/templates/addons/code-server/_container.tpl#L37
+          deployKeySecret: git-ssh-keys
         ingress:
           enabled: true
           ingressClassName: "nginx"

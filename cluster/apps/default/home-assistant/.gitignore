@@ -1,0 +1,86 @@
+# Home Assistant .gitignore
+# This should be placed in the root of your HA config directory
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Log files
+*.log
+*.log.*
+*.log.fault
+*.log.1
+*.log.2
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Dependencies and caches
+deps/
+tts/
+image/
+www/
+.cache/
+.storage/
+.__pycache__/
+*.pyc
+
+# Temporary files
+*.tmp
+*.temp
+.uuid
+
+# Secrets (you might want to commit secrets.yaml encrypted, or use a different approach)
+secrets.yaml
+ip_bans.yaml
+
+# Local development
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Home Assistant specific
+home-assistant.log*
+home-assistant_v2.db*
+OZW_Log.txt
+zigbee.db*
+zigbee2mqtt_*.db*
+*.conf
+
+# Media and cache directories
+f1_replay_cache/
+
+# Google/Amazon files that might be generated
+.google.token
+.sonos_*
+
+# Node modules if using custom components
+node_modules/
+
+# Compiled python
+__pycache__/
+*.py[cod]
+
+# Keep these files but ignore generated content in some dirs
+# (you can adjust based on what you want to track)
+custom_components/**/translations/*.json
+
+# Ignore ESPHome compiled files if you keep ESPHome configs here
+.esphome/
+*.bin
+
+# Ignore UI customizations if you don't want to track them
+.cloud/
+.HA_VERSION
+
+# Keep structure but ignore contents of certain directories
+# Comment out if you want to track these
+blueprints/automation/*
+blueprints/script/*
+!blueprints/**/.gitkeep
