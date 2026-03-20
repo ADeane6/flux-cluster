@@ -73,7 +73,8 @@ git pull
 ## Files Tracked
 
 The `.gitignore` excludes:
-- Database files (*.db, *.db-shm, *.db-wal)
+
+- Database files (_.db, _.db-shm, \*.db-wal)
 - Log files
 - Backups
 - Cache directories (deps/, tts/, image/, www/)
@@ -89,10 +90,3 @@ The `.gitignore` excludes:
 - Custom components
 - Templates and themes
 - Blueprints (if custom)
-
-## Secrets Management
-
-**Important:** `secrets.yaml` is excluded from git. Options:
-1. Store secrets in a password manager
-2. Use a separate encrypted secrets repo
-3. Document required secrets in a `secrets.yaml.example` file

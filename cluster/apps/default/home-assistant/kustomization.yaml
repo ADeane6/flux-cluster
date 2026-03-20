@@ -5,6 +5,7 @@ namespace: default
 resources:
   - ./helm-release.yaml
   - ./home-assistant-pvc.yaml
+  - ./secret.sops.yaml
 patchesStrategicMerge:
   - voice-assistant-ports.yaml
 configMapGenerator:
