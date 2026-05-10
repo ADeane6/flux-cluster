@@ -27,26 +27,13 @@ spec:
       tag: latest
     env:
       TZ: "UTC"
-      ESPHOME_DASHBOARD_USE_PING: "true"
+    securityContext:
+      privileged: true
     service:
       main:
         ports:
           http:
             port: 6052
-          mdns:
-            port: 5353
-            protocol: UDP
-      lb:
-        type: LoadBalancer
-        loadBalancerIP: "${ESPHOME_LB}"
-        externalTrafficPolicy: Local
-        ports:
-          http-lb:
-            port: 6052
-          mdns-lb:
-            port: 5353
-            targetPort: 5353
-            protocol: UDP
     ingress:
       main:
         enabled: true

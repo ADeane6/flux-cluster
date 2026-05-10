@@ -8,6 +8,7 @@ resources:
   # - ./unifi
   - ./jackett
   - ./home-assistant
+  - ./esphome
   - ./zigbee2mqtt
   - ./openwakeword
   - ./whisper
