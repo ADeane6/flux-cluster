@@ -8,46 +8,55 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 3.7.3
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  install:
-    createNamespace: true
-    remediation:
-      retries: 5
-  upgrade:
-    remediation:
-      retries: 5
   values:
-    hostNetwork: true
-    image:
-      repository: esphome/esphome
-      tag: latest
-    env:
-      TZ: "UTC"
-    securityContext:
-      privileged: true
-    service:
+    controllers:
       main:
+        annotations:
+          reloader.stakater.com/reload: "esphome-config"
+        containers:
+          app:
+            image:
+              repository: esphome/esphome
+              tag: latest
+            env:
+              TZ: "${TIMEZONE}"
+            securityContext:
+              privileged: false
+            hostNetwork: true
+    service:
+      app:
+        controller: main
         ports:
           http:
             port: 6052
     ingress:
       main:
         enabled: true
+        className: "nginx"
         annotations:
-        ingressClassName: "nginx"
+          cert-manager.io/cluster-issuer: "letsencrypt-production"
+          hajimari.io/enable: "true"
+          hajimari.io/icon: "eos-icons:home"
+          hajimari.io/appName: ESPHome
         hosts:
           - host: &host "esphome.${SECRET_DOMAIN}"
             paths:
               - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - hosts:
               - *host
+            secretName: "esphome-tls"
     persistence:
       config:
         enabled: true
         existingClaim: esphome-config
-        mountPath: /config
+        globalMounts:
+          - path: /config
