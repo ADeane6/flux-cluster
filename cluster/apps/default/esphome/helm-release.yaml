@@ -18,6 +18,8 @@ spec:
       main:
         annotations:
           reloader.stakater.com/reload: "esphome-config"
+        pod:
+          hostNetwork: true
         containers:
           app:
             image:
@@ -26,8 +28,7 @@ spec:
             env:
               TZ: "${TIMEZONE}"
             securityContext:
-              privileged: false
-            hostNetwork: true
+              privileged: true
     service:
       app:
         controller: main
