@@ -58,9 +58,22 @@ kubectl get helmrelease <helmrelease-name> -n <namespace> -o yaml
 ## logs of helm controller
 kubectl logs -n flux-system -l app=helm-controller
 kubectl logs -n flux-system $(kubectl get pod -n flux-system --field-selector=status.phase=Running |  awk '/helm-controller*/{print $1}') -f
+```
 
+## ESPHome
 
+ESPHome configs are synced with a dedicated git repo: `ADeane6/esphome_config`
 
+The git-sync sidecar automatically commits and pushes dashboard changes every 5 minutes, and pulls remote changes on the same cycle.
+
+### Manual sync commands
+
+```bash
+# Push dashboard changes to git immediately
+kubectl exec -n default deploy/esphome -c git-sync -- sh -c "cd /config && git add -A && git diff --cached --quiet || git commit -m 'manual sync' && git pull --rebase && git push"
+
+# Pull remote changes immediately
+kubectl exec -n default deploy/esphome -c git-sync -- sh -c "cd /config && git pull --rebase"
 ```
 
 # Template for deploying k3s backed by Flux

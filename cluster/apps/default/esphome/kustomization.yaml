@@ -5,3 +5,4 @@ resources:
   - helm-release.yaml
   - config-pvc.yaml
   - secret.sops.yaml
+  - git-ssh-secret.sops.yaml

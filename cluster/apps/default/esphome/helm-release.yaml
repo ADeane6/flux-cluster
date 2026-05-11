@@ -20,6 +20,27 @@ spec:
           reloader.stakater.com/reload: "esphome-config"
         pod:
           hostNetwork: true
+        initContainers:
+          git-clone:
+            image:
+              repository: alpine/git
+              tag: latest
+            command:
+              - /bin/sh
+              - -c
+              - |
+                if [ ! -d /config/.git ]; then
+                  git clone git@github.com:ADeane6/esphome_config.git /tmp/repo
+                  cp -a /tmp/repo/. /config/
+                else
+                  cd /config
+                  git stash || true
+                  git pull --ff-only || true
+                  git stash pop || true
+                fi
+            env:
+              - name: GIT_SSH_COMMAND
+                value: "ssh -i /etc/git-secret/ssh-key -o StrictHostKeyChecking=no"
         containers:
           app:
             image:
@@ -29,6 +50,27 @@ spec:
               TZ: "${TIMEZONE}"
             securityContext:
               privileged: true
+          git-sync:
+            image:
+              repository: alpine/git
+              tag: latest
+            command:
+              - /bin/sh
+              - -c
+              - |
+                cd /config
+                git config user.name "ESPHome Dashboard"
+                git config user.email "esphome@tomnuc.home"
+                while true; do
+                  sleep 300
+                  git add -A
+                  git diff --cached --quiet || git commit -m "auto: dashboard config update"
+                  git pull --rebase || true
+                  git push || true
+                done
+            env:
+              - name: GIT_SSH_COMMAND
+                value: "ssh -i /etc/git-secret/ssh-key -o StrictHostKeyChecking=no"
     service:
       app:
         controller: main
@@ -64,6 +106,20 @@ spec:
       secrets:
         type: secret
         name: esphome-secrets
-        globalMounts:
-          - path: /config/secrets.yaml
-            subPath: secrets.yaml
+        advancedMounts:
+          main:
+            app:
+              - path: /config/secrets.yaml
+                subPath: secrets.yaml
+      git-ssh:
+        type: secret
+        name: esphome-git-ssh
+        defaultMode: 0400
+        advancedMounts:
+          main:
+            git-clone:
+              - path: /etc/git-secret
+                readOnly: true
+            git-sync:
+              - path: /etc/git-secret
+                readOnly: true
