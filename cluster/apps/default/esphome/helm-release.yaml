@@ -61,3 +61,9 @@ spec:
         existingClaim: esphome-config
         globalMounts:
           - path: /config
+      secrets:
+        type: secret
+        name: esphome-secrets
+        globalMounts:
+          - path: /config/secrets.yaml
+            subPath: secrets.yaml
