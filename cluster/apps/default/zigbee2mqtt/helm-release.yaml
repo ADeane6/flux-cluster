@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: ghcr.io/koenkk/zigbee2mqtt
-      tag: 1.40.2
+      tag: 1.42.0
     persistence:
       data:
         enabled: true
