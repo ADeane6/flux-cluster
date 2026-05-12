@@ -15,5 +15,5 @@ resources:
   - ./metrics-server-charts.yaml
   - ./stakater-charts.yaml
   - ./minecraft-server-charts.yaml
-  - ./grafana-charts.yaml
+  - ./grafana-charts.yaml  # includes both grafana and grafana-community repos
   - ./netdata-charts.yaml
