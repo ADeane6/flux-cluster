@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-mcp
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "grafana-mcp.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-mcp
+                port:
+                  number: 8000
+  tls:
+    - secretName: grafana-mcp-tls
+      hosts:
+        - "grafana-mcp.${SECRET_DOMAIN}"
