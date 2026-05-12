@@ -1,0 +1,72 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: grafana
+      version: 10.5.15
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 512Mi
+    persistence:
+      enabled: true
+      existingClaim: grafana-data
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://loki.monitoring.svc.cluster.local:3100
+            isDefault: true
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-production"
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+        hajimari.io/enable: "true"
+        hajimari.io/icon: "chart-areaspline"
+        hajimari.io/appName: Grafana
+      hosts:
+        - "grafana.${SECRET_DOMAIN}"
+      tls:
+        - secretName: grafana-tls
+          hosts:
+            - "grafana.${SECRET_DOMAIN}"
+    env:
+      TZ: "${TIMEZONE}"
+    admin:
+      existingSecret: grafana-admin
+      passwordKey: admin-password
+    grafana.ini:
+      auth.proxy:
+        enabled: true
+        header_name: Cf-Access-Authenticated-User-Email
+        header_property: email
+        auto_sign_up: true
+      users:
+        auto_assign_org_role: Admin
