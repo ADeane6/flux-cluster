@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "grafana": {
+      "type": "sse",
+      "url": "https://grafana-mcp.ashleydeane.me/sse"
+    }
+  }
+}

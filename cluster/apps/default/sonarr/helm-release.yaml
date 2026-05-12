@@ -29,6 +29,7 @@ spec:
       TZ: "Ireland/Dublin"
       PUID: "351"
       PGID: "351"
+      SONARR__LOG__CONSOLEFORMAT: "Clef"
     service:
       main:
         ports:

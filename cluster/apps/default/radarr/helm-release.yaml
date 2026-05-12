@@ -29,6 +29,7 @@ spec:
       TZ: "Ireland/Dublin"
       PUID: "352"
       PGID: "352"
+      RADARR__LOG__CONSOLEFORMAT: "Clef"
     service:
       main:
         ports:
