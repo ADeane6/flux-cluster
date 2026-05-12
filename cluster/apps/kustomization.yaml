@@ -6,3 +6,4 @@ resources:
   - ./kube-system
   - ./games
   - ./monitoring
+  - ./system-upgrade
