@@ -27,6 +27,8 @@ spec:
       tag: latest
     env:
       TZ: "Ireland/Dublin"
+      NO_COLOR: "1"
+      FORCE_COLOR: "0"
     service:
       main:
         ports:
