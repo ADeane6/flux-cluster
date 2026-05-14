@@ -1,0 +1,59 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netdata
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: netdata
+      version: 3.7.163
+      sourceRef:
+        kind: HelmRepository
+        name: netdata
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    service:
+      type: ClusterIP
+      port: 19999
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-production"
+      path: /
+      pathType: Prefix
+      hosts:
+        - "netdata.${SECRET_DOMAIN}"
+      tls:
+        - secretName: netdata-tls
+          hosts:
+            - "netdata.${SECRET_DOMAIN}"
+    parent:
+      enabled: true
+      port: 19999
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 512Mi
+      persistence:
+        enabled: true
+        existingClaim: netdata-data
+    child:
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
