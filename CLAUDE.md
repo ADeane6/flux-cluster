@@ -18,8 +18,8 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 
 - **Router/Firewall:** UniFi Cloud Gateway Ultra
 - **Managed Switches:**
-  - TP-Link TL-SG108E 6.0 x2 (8-port, SNMP capable)
-  - Netgear GS724T (24-port, SNMP capable)
+  - TP-Link TL-SG108E 6.0 x2 (8-port, no SNMP support)
+  - Netgear GS724T (24-port, 10.0.3.253, SNMP v2c, community string `public`)
 - **MetalLB range:** 10.0.0.2 - 10.0.0.128
 
 ### Smart Home

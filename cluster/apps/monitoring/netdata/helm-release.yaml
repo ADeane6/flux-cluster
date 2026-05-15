@@ -49,6 +49,46 @@ spec:
       persistence:
         enabled: true
         existingClaim: netdata-data
+      configs:
+        netdata:
+          enabled: true
+          path: /etc/netdata/netdata.conf
+          data: |
+            [global]
+              hostname = tomnuc
+            [cloud]
+              enabled = no
+            [db]
+              mode = dbengine
+            [plugins]
+              cgroups = no
+              tc = no
+              enable running new plugins = no
+              check for new plugins every = 72000
+              python.d = no
+              charts.d = no
+              go.d = yes
+              node.d = no
+              apps = no
+              proc = no
+              idlejitter = no
+              diskspace = no
+        go.d:
+          enabled: true
+          path: /etc/netdata/go.d.conf
+          data: |
+            modules:
+              snmp: yes
+        go.d-snmp:
+          enabled: true
+          path: /etc/netdata/go.d/snmp.conf
+          data: |
+            jobs:
+              - name: netgear-gs724t
+                hostname: 10.0.3.253
+                community: public
+                version: 2
+                update_every: 30
     child:
       enabled: true
       resources:
