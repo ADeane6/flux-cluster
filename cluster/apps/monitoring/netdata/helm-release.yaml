@@ -89,6 +89,16 @@ spec:
                 community: public
                 version: 2
                 update_every: 30
+              - name: unifi-ucg-ultra
+                hostname: 10.0.3.254
+                community: public
+                version: 2
+                update_every: 30
+              - name: unifi-ap
+                hostname: 10.0.1.187
+                community: public
+                version: 2
+                update_every: 30
     child:
       enabled: true
       resources:

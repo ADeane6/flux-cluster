@@ -16,7 +16,8 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 
 ### Network
 
-- **Router/Firewall:** UniFi Cloud Gateway Ultra
+- **Router/Firewall:** UniFi Cloud Gateway Ultra (10.0.3.254, SNMP v2c)
+- **Access Point:** UniFi AP (10.0.1.187, SNMP v2c)
 - **Managed Switches:**
   - TP-Link TL-SG108E 6.0 x2 (8-port, no SNMP support)
   - Netgear GS724T (24-port, 10.0.3.253, SNMP v2c, community string `public`)
