@@ -55,28 +55,18 @@ data:
     }
 
     // Relabel syslog to extract device info
+    // Use labelmap to promote all __syslog_ internal labels
     loki.relabel "syslog" {
       forward_to = [loki.write.default.receiver]
 
       rule {
-        source_labels = ["__syslog_connection_hostname"]
-        target_label  = "device_ip"
+        action       = "labelmap"
+        regex        = "__syslog_message_(.*)"
       }
       rule {
-        source_labels = ["__syslog_message_hostname"]
-        target_label  = "device"
-      }
-      rule {
-        source_labels = ["__syslog_message_app_name"]
-        target_label  = "app"
-      }
-      rule {
-        source_labels = ["__syslog_message_severity"]
-        target_label  = "severity"
-      }
-      rule {
-        source_labels = ["__syslog_message_facility"]
-        target_label  = "facility"
+        action       = "labelmap"
+        regex        = "__syslog_connection_(.*)"
+        replacement  = "connection_$1"
       }
     }
 
