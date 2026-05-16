@@ -33,14 +33,7 @@ spec:
           memory: 64Mi
         limits:
           memory: 256Mi
-    controller:
-      type: daemonset
-    service:
-      enabled: true
-      type: LoadBalancer
-      loadBalancerIP: "${SYSLOG_LB}"
-      externalTrafficPolicy: Local
-      ports:
+      extraPorts:
         - name: syslog-udp
           port: 514
           targetPort: 514
@@ -49,3 +42,10 @@ spec:
           port: 1514
           targetPort: 1514
           protocol: TCP
+    controller:
+      type: daemonset
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: "${SYSLOG_LB}"
