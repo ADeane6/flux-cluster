@@ -37,28 +37,10 @@ data:
       forward_to = [loki.write.default.receiver]
     }
 
-    // Syslog listener for external devices
-    // Using RFC 5424 format - devices that send RFC 3164 will have
-    // their messages parsed with best-effort field extraction
-    loki.source.syslog "external" {
-      listener {
-        address              = "0.0.0.0:514"
-        protocol             = "udp"
-        labels               = { source = "syslog" }
-        use_rfc5424_message  = true
-      }
-      listener {
-        address              = "0.0.0.0:1514"
-        protocol             = "tcp"
-        labels               = { source = "syslog" }
-        use_rfc5424_message  = true
-      }
-      forward_to = [loki.relabel.syslog.receiver]
-    }
-
-    // Relabel syslog to extract device info
-    loki.relabel "syslog" {
-      forward_to = [loki.write.default.receiver]
+    // Relabel rules to promote __syslog_ internal labels
+    // These rules run INSIDE loki.source.syslog before labels are stripped
+    loki.relabel "syslog_labels" {
+      forward_to = []
 
       rule {
         source_labels = ["__syslog_message_hostname"]
@@ -80,6 +62,24 @@ data:
         source_labels = ["__syslog_message_facility"]
         target_label  = "facility"
       }
+    }
+
+    // Syslog listener for external devices (all RFC 3164)
+    loki.source.syslog "external" {
+      listener {
+        address       = "0.0.0.0:514"
+        protocol      = "udp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
+      }
+      listener {
+        address       = "0.0.0.0:1514"
+        protocol      = "tcp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
+      }
+      relabel_rules = loki.relabel.syslog_labels.rules
+      forward_to    = [loki.write.default.receiver]
     }
 
     // Write to Loki
