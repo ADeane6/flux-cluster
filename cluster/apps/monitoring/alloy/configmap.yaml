@@ -40,14 +40,16 @@ data:
     // Syslog listener for external devices
     loki.source.syslog "external" {
       listener {
-        address  = "0.0.0.0:514"
-        protocol = "udp"
-        labels   = { source = "syslog" }
+        address       = "0.0.0.0:514"
+        protocol      = "udp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
       }
       listener {
-        address  = "0.0.0.0:1514"
-        protocol = "tcp"
-        labels   = { source = "syslog" }
+        address       = "0.0.0.0:1514"
+        protocol      = "tcp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
       }
       forward_to = [loki.relabel.syslog.receiver]
     }
