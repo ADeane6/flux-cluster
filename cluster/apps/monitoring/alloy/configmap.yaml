@@ -47,7 +47,7 @@ data:
         target_label  = "device"
       }
       rule {
-        source_labels = ["__syslog_connection_hostname"]
+        source_labels = ["__syslog_connection_ip_address"]
         target_label  = "device_ip"
       }
       rule {
