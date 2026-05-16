@@ -60,6 +60,10 @@ data:
 
       rule {
         source_labels = ["__syslog_connection_hostname"]
+        target_label  = "device_ip"
+      }
+      rule {
+        source_labels = ["__syslog_message_hostname"]
         target_label  = "device"
       }
       rule {
@@ -69,6 +73,10 @@ data:
       rule {
         source_labels = ["__syslog_message_severity"]
         target_label  = "severity"
+      }
+      rule {
+        source_labels = ["__syslog_message_facility"]
+        target_label  = "facility"
       }
     }
 
