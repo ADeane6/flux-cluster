@@ -1,0 +1,58 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: graphite-exporter
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    image:
+      repository: prom/graphite-exporter
+      tag: latest
+    args:
+      - --graphite.mapping-config=/config/graphite_mapping.yaml
+      - --graphite.listen-address=:2003
+    service:
+      main:
+        ports:
+          http:
+            port: 9108
+      lb:
+        type: LoadBalancer
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "${GRAPHITE_LB}"
+        ports:
+          graphite:
+            enabled: true
+            port: 2003
+            targetPort: 2003
+            protocol: TCP
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: graphite-exporter-mapping
+        mountPath: /config
+        readOnly: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi

@@ -3,6 +3,10 @@
     "grafana": {
       "type": "sse",
       "url": "https://grafana-mcp.ashleydeane.me/sse"
+    },
+    "netdata": {
+      "type": "http",
+      "url": "http://10.0.0.20:19999/mcp"
     }
   }
 }

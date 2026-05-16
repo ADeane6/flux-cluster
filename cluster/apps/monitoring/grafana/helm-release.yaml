@@ -46,6 +46,10 @@ spec:
             access: proxy
             url: http://loki.monitoring.svc.cluster.local:3100
             isDefault: true
+          - name: TrueNAS
+            type: prometheus
+            access: proxy
+            url: http://graphite-exporter.monitoring.svc.cluster.local:9108
     ingress:
       enabled: true
       ingressClassName: nginx

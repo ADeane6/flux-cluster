@@ -8,3 +8,4 @@ resources:
   - ./alloy
   - ./grafana-mcp
   - ./netdata
+  - ./graphite-exporter

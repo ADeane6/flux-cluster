@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graphite-exporter-mapping
+  namespace: monitoring
+data:
+  graphite_mapping.yaml: |
+    mappings:
+      # CPU
+      - match: "servers.*.cpu-*.cpu-*"
+        name: "truenas_cpu_usage"
+        labels:
+          hostname: "$1"
+          cpu: "$2"
+          mode: "$3"
+      - match: "servers.*.cpu-*.percent-*"
+        name: "truenas_cpu_percent"
+        labels:
+          hostname: "$1"
+          cpu: "$2"
+          mode: "$3"
+      # Disk temperature
+      - match: "servers.*.disktemp-*.temperature"
+        name: "truenas_disk_temperature_celsius"
+        labels:
+          hostname: "$1"
+          disk: "$2"
+      # Disk I/O
+      - match: "servers.*.disk-*.disk_octets.*"
+        name: "truenas_disk_bytes"
+        labels:
+          hostname: "$1"
+          disk: "$2"
+          direction: "$3"
+      - match: "servers.*.disk-*.disk_ops.*"
+        name: "truenas_disk_ops"
+        labels:
+          hostname: "$1"
+          disk: "$2"
+          direction: "$3"
+      - match: "servers.*.disk-*.disk_time.*"
+        name: "truenas_disk_time"
+        labels:
+          hostname: "$1"
+          disk: "$2"
+          direction: "$3"
+      - match: "servers.*.disk-*.pending_operations"
+        name: "truenas_disk_pending_operations"
+        labels:
+          hostname: "$1"
+          disk: "$2"
+      # Filesystem
+      - match: "servers.*.df-*.df_complex-*"
+        name: "truenas_df_bytes"
+        labels:
+          hostname: "$1"
+          filesystem: "$2"
+          type: "$3"
+      # Memory
+      - match: "servers.*.memory.memory-*"
+        name: "truenas_memory_bytes"
+        labels:
+          hostname: "$1"
+          type: "$2"
+      # Swap
+      - match: "servers.*.swap.swap-*"
+        name: "truenas_swap_bytes"
+        labels:
+          hostname: "$1"
+          type: "$2"
+      - match: "servers.*.swap.swap_io-*"
+        name: "truenas_swap_io"
+        labels:
+          hostname: "$1"
+          direction: "$2"
+      # Network
+      - match: "servers.*.interface-*.if_octets.*"
+        name: "truenas_network_bytes"
+        labels:
+          hostname: "$1"
+          interface: "$2"
+          direction: "$3"
+      - match: "servers.*.interface-*.if_packets.*"
+        name: "truenas_network_packets"
+        labels:
+          hostname: "$1"
+          interface: "$2"
+          direction: "$3"
+      - match: "servers.*.interface-*.if_errors.*"
+        name: "truenas_network_errors"
+        labels:
+          hostname: "$1"
+          interface: "$2"
+          direction: "$3"
+      # Load
+      - match: "servers.*.load.load.*"
+        name: "truenas_load"
+        labels:
+          hostname: "$1"
+          period: "$2"
+      # Uptime
+      - match: "servers.*.uptime.uptime"
+        name: "truenas_uptime_seconds"
+        labels:
+          hostname: "$1"
+      # Processes
+      - match: "servers.*.processes.ps_state-*"
+        name: "truenas_processes"
+        labels:
+          hostname: "$1"
+          state: "$2"
+      # ZFS ARC
+      - match: "servers.*.zfs_arc.cache_size-*"
+        name: "truenas_zfs_arc_size_bytes"
+        labels:
+          hostname: "$1"
+          type: "$2"
+      - match: "servers.*.zfs_arc.cache_result-*-*"
+        name: "truenas_zfs_arc_result"
+        labels:
+          hostname: "$1"
+          type: "$2"
+          result: "$3"
+      - match: "servers.*.zfs_arc.cache_ratio-*-*"
+        name: "truenas_zfs_arc_ratio"
+        labels:
+          hostname: "$1"
+          type: "$2"
+          result: "$3"
+      # ZFS ARC v2
+      - match: "servers.*.zfs_arc_v2.io_octets-*"
+        name: "truenas_zfs_arc_v2_bytes"
+        labels:
+          hostname: "$1"
+          direction: "$2"
+      # Catch-all for unmapped metrics
+      - match: "."
+        match_type: "regex"
+        name: "truenas_graphite_unmatched"
+        labels:
+          graphite_name: "$0"
