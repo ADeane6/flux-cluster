@@ -5,4 +5,5 @@ resources:
   - helm-release.yaml
   - config-pvc.yaml
   - service-lb.yaml
+  - secret.sops.yaml
   - service-lb.yaml

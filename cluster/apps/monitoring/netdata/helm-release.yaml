@@ -40,6 +40,13 @@ spec:
     parent:
       enabled: true
       port: 19999
+      claiming:
+        enabled: true
+        token: ""
+        rooms: ""
+      envFrom:
+        - secretRef:
+            name: netdata-claim
       resources:
         requests:
           cpu: 100m
@@ -56,8 +63,6 @@ spec:
           data: |
             [global]
               hostname = netdata-parent
-            [cloud]
-              enabled = no
             [db]
               mode = dbengine
             [plugins]
@@ -96,6 +101,13 @@ spec:
                 update_every: 30
     child:
       enabled: true
+      claiming:
+        enabled: true
+        token: ""
+        rooms: ""
+      envFrom:
+        - secretRef:
+            name: netdata-claim
       resources:
         requests:
           cpu: 50m
