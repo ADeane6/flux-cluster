@@ -38,35 +38,47 @@ data:
     }
 
     // Syslog listener for external devices
+    // Using RFC 5424 format - devices that send RFC 3164 will have
+    // their messages parsed with best-effort field extraction
     loki.source.syslog "external" {
       listener {
-        address       = "0.0.0.0:514"
-        protocol      = "udp"
-        syslog_format = "rfc3164"
-        labels        = { source = "syslog" }
+        address              = "0.0.0.0:514"
+        protocol             = "udp"
+        labels               = { source = "syslog" }
+        use_rfc5424_message  = true
       }
       listener {
-        address       = "0.0.0.0:1514"
-        protocol      = "tcp"
-        syslog_format = "rfc3164"
-        labels        = { source = "syslog" }
+        address              = "0.0.0.0:1514"
+        protocol             = "tcp"
+        labels               = { source = "syslog" }
+        use_rfc5424_message  = true
       }
       forward_to = [loki.relabel.syslog.receiver]
     }
 
     // Relabel syslog to extract device info
-    // Use labelmap to promote all __syslog_ internal labels
     loki.relabel "syslog" {
       forward_to = [loki.write.default.receiver]
 
       rule {
-        action       = "labelmap"
-        regex        = "__syslog_message_(.*)"
+        source_labels = ["__syslog_message_hostname"]
+        target_label  = "device"
       }
       rule {
-        action       = "labelmap"
-        regex        = "__syslog_connection_(.*)"
-        replacement  = "connection_$1"
+        source_labels = ["__syslog_connection_hostname"]
+        target_label  = "device_ip"
+      }
+      rule {
+        source_labels = ["__syslog_message_app_name"]
+        target_label  = "app"
+      }
+      rule {
+        source_labels = ["__syslog_message_severity"]
+        target_label  = "severity"
+      }
+      rule {
+        source_labels = ["__syslog_message_facility"]
+        target_label  = "facility"
       }
     }
 
