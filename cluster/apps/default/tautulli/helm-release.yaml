@@ -39,6 +39,10 @@ spec:
           cert-manager.io/cluster-issuer: "letsencrypt-production"
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+          nginx.ingress.kubernetes.io/proxy-redirect-from: "~^(http(?:s)?://)([^:/]+)(?::\\d+)?(/.*)?$"
+          nginx.ingress.kubernetes.io/proxy-redirect-to: "$1$2$3"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header X-Forwarded-Ssl on;
         ingressClassName: "nginx"
         hosts:
           - host: &host "tautulli.${SECRET_DOMAIN}"
