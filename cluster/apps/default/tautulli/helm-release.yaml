@@ -45,7 +45,8 @@ spec:
             paths:
               - path: /
         tls:
-          - hosts:
+          - secretName: "tautulli-tls"
+            hosts:
               - *host
     persistence:
       config:
