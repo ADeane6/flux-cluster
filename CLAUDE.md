@@ -78,9 +78,13 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - Network throughput between TrueNAS and k3s node
 
 ### Network Performance
-- Switch port utilisation (SNMP via planned Netdata deployment)
+- Switch port utilisation (SNMP via Netdata)
 - Link speeds (watch for degraded 100Mbps links on gigabit ports)
 - Inter-VLAN routing performance through UniFi gateway
+- k3s node NIC: Realtek r8169 on enp1s0 — known to negotiate 100Mbps with bad cables
+
+### Known Issues (Resolved)
+- **2026-05-17 crash:** Node locked up due to NFS hard mount hang, compounded by degraded 100Mbps network link (bad cable). iowait climbed from 14% to 39% over an hour before the node became unresponsive. Fix: replaced cable (1Gbps restored), changed NFS mounts from hard to soft.
 
 ## Repo Structure
 

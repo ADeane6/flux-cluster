@@ -33,6 +33,14 @@ spec:
           memory: 64Mi
         limits:
           memory: 256Mi
+      mounts:
+        extra:
+          - name: journal
+            mountPath: /var/log/journal
+            readOnly: true
+          - name: machine-id
+            mountPath: /etc/machine-id
+            readOnly: true
       extraPorts:
         - name: syslog-udp
           port: 514
@@ -44,6 +52,14 @@ spec:
           protocol: TCP
     controller:
       type: daemonset
+      volumes:
+        extra:
+          - name: journal
+            hostPath:
+              path: /var/log/journal
+          - name: machine-id
+            hostPath:
+              path: /etc/machine-id
     service:
       enabled: true
       type: LoadBalancer

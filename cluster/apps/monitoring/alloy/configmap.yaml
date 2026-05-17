@@ -82,6 +82,35 @@ data:
       forward_to    = [loki.write.default.receiver]
     }
 
+    // Host journal logs (kernel, systemd, dmesg)
+    loki.relabel "journal_labels" {
+      forward_to = []
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+      rule {
+        source_labels = ["__journal__transport"]
+        target_label  = "transport"
+      }
+      rule {
+        source_labels = ["__journal_priority_keyword"]
+        target_label  = "level"
+      }
+      rule {
+        source_labels = ["__journal__hostname"]
+        target_label  = "host"
+      }
+    }
+
+    loki.source.journal "host" {
+      path          = "/var/log/journal"
+      labels        = { source = "journal" }
+      relabel_rules = loki.relabel.journal_labels.rules
+      forward_to    = [loki.write.default.receiver]
+    }
+
     // Write to Loki
     loki.write "default" {
       endpoint {

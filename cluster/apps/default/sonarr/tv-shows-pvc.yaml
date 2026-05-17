@@ -11,6 +11,10 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs
+  mountOptions:
+    - soft
+    - timeo=50
+    - retrans=3
   nfs:
     server: freenas.home
     path: /mnt/all/tv_shows
