@@ -65,7 +65,16 @@ data:
         labels:
           hostname: "$${1}"
           disk: "$${2}"
-      # GEOM stats (FreeBSD disk stats)
+      # GEOM stats with direction (geom_bw, geom_latency, geom_ops, geom_ops_rwd, geom_queue)
+      - match: 'servers\.([^.]*)\.geom_stat\.([^.]*)\.([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_geom_stat_detail"
+        labels:
+          hostname: "$${1}"
+          metric: "$${2}"
+          disk: "$${3}"
+          direction: "$${4}"
+      # GEOM stats without direction (geom_busy_percent)
       - match: 'servers\.([^.]*)\.geom_stat\.([^.]*)\.([^.]*)'
         match_type: regex
         name: "truenas_geom_stat"
@@ -180,7 +189,22 @@ data:
         labels:
           hostname: "$${1}"
           type: "$${2}"
-      # ZFS ARC other single-value metrics
+      # ZFS ARC io_octets (3 dots: io_octets.L2.rx/tx)
+      - match: 'servers\.([^.]*)\.zfs_arc\.io_octets\.([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arc_io_bytes"
+        labels:
+          hostname: "$${1}"
+          cache: "$${2}"
+          direction: "$${3}"
+      # ZFS ARC mutex_operations (2 dots)
+      - match: 'servers\.([^.]*)\.zfs_arc\.mutex_operations\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arc_mutex"
+        labels:
+          hostname: "$${1}"
+          type: "$${2}"
+      # ZFS ARC single-value metrics (1 dot: hash_collisions, memory_throttle_count)
       - match: 'servers\.([^.]*)\.zfs_arc\.([^.]*)'
         match_type: regex
         name: "truenas_zfs_arc_misc"
@@ -211,7 +235,17 @@ data:
           hostname: "$${1}"
           category: "l2"
           type: "$${2}"
-      # CTL (iSCSI/FC target) stats
+      # CTL (iSCSI/FC target) stats with LUN
+      - match: 'servers\.([^.]*)\.ctl\.([^.]*)\.([^.]*)\.([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_ctl_lun"
+        labels:
+          hostname: "$${1}"
+          target: "$${2}"
+          metric: "$${3}"
+          lun: "$${4}"
+          direction: "$${5}"
+      # CTL (iSCSI/FC target) stats without LUN
       - match: 'servers\.([^.]*)\.ctl\.([^.]*)\.([^.]*)\.([^.]*)'
         match_type: regex
         name: "truenas_ctl"
