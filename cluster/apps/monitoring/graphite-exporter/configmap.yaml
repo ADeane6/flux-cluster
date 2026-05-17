@@ -7,58 +7,73 @@ metadata:
 data:
   graphite_mapping.yaml: |
     mappings:
-      # CPU
-      - match: 'servers\.([^.]*)\.cpu-([^.]*)\.cpu-([^.]*)'
-        match_type: regex
-        name: "truenas_cpu_usage"
-        labels:
-          hostname: "$${1}"
-          cpu: "$${2}"
-          mode: "$${3}"
-      - match: 'servers\.([^.]*)\.cpu-([^.]*)\.percent-([^.]*)'
+      # CPU per-core percent
+      - match: 'servers\.([^.]*)\.cpu\.([^.]*)\.percent\.([^.]*)'
         match_type: regex
         name: "truenas_cpu_percent"
         labels:
           hostname: "$${1}"
           cpu: "$${2}"
           mode: "$${3}"
-      # Disk temperature
-      - match: 'servers\.([^.]*)\.disktemp-([^.]*)\.temperature'
+      # CPU aggregation (average/sum)
+      - match: 'servers\.([^.]*)\.aggregation\.(cpu-[^.]*)\.gauge\.([^.]*)'
         match_type: regex
-        name: "truenas_disk_temperature_celsius"
+        name: "truenas_cpu_aggregation"
         labels:
           hostname: "$${1}"
-          disk: "$${2}"
-      # Disk I/O
-      - match: 'servers\.([^.]*)\.disk-([^.]*)\.disk_octets\.([^.]*)'
+          aggregation: "$${2}"
+          mode: "$${3}"
+      # CPU temperature
+      - match: 'servers\.([^.]*)\.cputemp\.([^.]*)\.temperature'
+        match_type: regex
+        name: "truenas_cpu_temperature_celsius"
+        labels:
+          hostname: "$${1}"
+          cpu: "$${2}"
+      # Disk I/O (disk_octets, disk_ops, disk_time, disk_io_time)
+      - match: 'servers\.([^.]*)\.disk\.([^.]*)\.disk_octets\.([^.]*)'
         match_type: regex
         name: "truenas_disk_bytes"
         labels:
           hostname: "$${1}"
           disk: "$${2}"
           direction: "$${3}"
-      - match: 'servers\.([^.]*)\.disk-([^.]*)\.disk_ops\.([^.]*)'
+      - match: 'servers\.([^.]*)\.disk\.([^.]*)\.disk_ops\.([^.]*)'
         match_type: regex
         name: "truenas_disk_ops"
         labels:
           hostname: "$${1}"
           disk: "$${2}"
           direction: "$${3}"
-      - match: 'servers\.([^.]*)\.disk-([^.]*)\.disk_time\.([^.]*)'
+      - match: 'servers\.([^.]*)\.disk\.([^.]*)\.disk_time\.([^.]*)'
         match_type: regex
         name: "truenas_disk_time"
         labels:
           hostname: "$${1}"
           disk: "$${2}"
           direction: "$${3}"
-      - match: 'servers\.([^.]*)\.disk-([^.]*)\.pending_operations'
+      - match: 'servers\.([^.]*)\.disk\.([^.]*)\.disk_io_time\.([^.]*)'
+        match_type: regex
+        name: "truenas_disk_io_time"
+        labels:
+          hostname: "$${1}"
+          disk: "$${2}"
+          type: "$${3}"
+      - match: 'servers\.([^.]*)\.disk\.([^.]*)\.pending_operations'
         match_type: regex
         name: "truenas_disk_pending_operations"
         labels:
           hostname: "$${1}"
           disk: "$${2}"
-      # Filesystem
-      - match: 'servers\.([^.]*)\.df-([^.]*)\.df_complex-([^.]*)'
+      # GEOM stats (FreeBSD disk stats)
+      - match: 'servers\.([^.]*)\.geom_stat\.([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_geom_$${2}"
+        labels:
+          hostname: "$${1}"
+          disk: "$${3}"
+      # Filesystem (df)
+      - match: 'servers\.([^.]*)\.df\.([^.]*)\.df_complex\.([^.]*)'
         match_type: regex
         name: "truenas_df_bytes"
         labels:
@@ -66,41 +81,35 @@ data:
           filesystem: "$${2}"
           type: "$${3}"
       # Memory
-      - match: 'servers\.([^.]*)\.memory\.memory-([^.]*)'
+      - match: 'servers\.([^.]*)\.memory\.memory\.([^.]*)'
         match_type: regex
         name: "truenas_memory_bytes"
         labels:
           hostname: "$${1}"
           type: "$${2}"
       # Swap
-      - match: 'servers\.([^.]*)\.swap\.swap-([^.]*)'
+      - match: 'servers\.([^.]*)\.swap\.swap\.([^.]*)'
         match_type: regex
         name: "truenas_swap_bytes"
         labels:
           hostname: "$${1}"
           type: "$${2}"
-      - match: 'servers\.([^.]*)\.swap\.swap_io-([^.]*)'
-        match_type: regex
-        name: "truenas_swap_io"
-        labels:
-          hostname: "$${1}"
-          direction: "$${2}"
-      # Network
-      - match: 'servers\.([^.]*)\.interface-([^.]*)\.if_octets\.([^.]*)'
+      # Network interfaces
+      - match: 'servers\.([^.]*)\.interface\.([^.]*)\.if_octets\.([^.]*)'
         match_type: regex
         name: "truenas_network_bytes"
         labels:
           hostname: "$${1}"
           interface: "$${2}"
           direction: "$${3}"
-      - match: 'servers\.([^.]*)\.interface-([^.]*)\.if_packets\.([^.]*)'
+      - match: 'servers\.([^.]*)\.interface\.([^.]*)\.if_packets\.([^.]*)'
         match_type: regex
         name: "truenas_network_packets"
         labels:
           hostname: "$${1}"
           interface: "$${2}"
           direction: "$${3}"
-      - match: 'servers\.([^.]*)\.interface-([^.]*)\.if_errors\.([^.]*)'
+      - match: 'servers\.([^.]*)\.interface\.([^.]*)\.if_errors\.([^.]*)'
         match_type: regex
         name: "truenas_network_errors"
         labels:
@@ -121,39 +130,90 @@ data:
         labels:
           hostname: "$${1}"
       # Processes
-      - match: 'servers\.([^.]*)\.processes\.ps_state-([^.]*)'
+      - match: 'servers\.([^.]*)\.processes\.ps_state\.([^.]*)'
         match_type: regex
         name: "truenas_processes"
         labels:
           hostname: "$${1}"
           state: "$${2}"
-      # ZFS ARC size
-      - match: 'servers\.([^.]*)\.zfs_arc\.cache_size-([^.]*)'
+      # NFS stats
+      - match: 'servers\.([^.]*)\.nfsstat\.([^.]*)\.nfsstat\.([^.]*)'
         match_type: regex
-        name: "truenas_zfs_arc_size_bytes"
+        name: "truenas_nfsstat"
         labels:
           hostname: "$${1}"
           type: "$${2}"
-      # ZFS ARC results
-      - match: 'servers\.([^.]*)\.zfs_arc\.cache_result-([^.]*)-([^.]*)'
+          op: "$${3}"
+      # ZFS ARC cache size
+      - match: 'servers\.([^.]*)\.zfs_arc\.cache_size\.([^.]*)'
         match_type: regex
-        name: "truenas_zfs_arc_result"
+        name: "truenas_zfs_arc_size"
         labels:
           hostname: "$${1}"
           type: "$${2}"
-          result: "$${3}"
-      # ZFS ARC ratios
-      - match: 'servers\.([^.]*)\.zfs_arc\.cache_ratio-([^.]*)-([^.]*)'
+      # ZFS ARC cache ratio
+      - match: 'servers\.([^.]*)\.zfs_arc\.cache_ratio\.([^.]*)'
         match_type: regex
         name: "truenas_zfs_arc_ratio"
         labels:
           hostname: "$${1}"
           type: "$${2}"
-          result: "$${3}"
-      # ZFS ARC v2
-      - match: 'servers\.([^.]*)\.zfs_arc_v2\.io_octets-([^.]*)'
+      # ZFS ARC cache result
+      - match: 'servers\.([^.]*)\.zfs_arc\.cache_result\.([^.]*)'
         match_type: regex
-        name: "truenas_zfs_arc_v2_bytes"
+        name: "truenas_zfs_arc_result"
         labels:
           hostname: "$${1}"
-          direction: "$${2}"
+          type: "$${2}"
+      # ZFS ARC cache eviction
+      - match: 'servers\.([^.]*)\.zfs_arc\.cache_eviction\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arc_eviction"
+        labels:
+          hostname: "$${1}"
+          type: "$${2}"
+      # ZFS ARC cache operation
+      - match: 'servers\.([^.]*)\.zfs_arc\.cache_operation\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arc_operation"
+        labels:
+          hostname: "$${1}"
+          type: "$${2}"
+      # ZFS ARC other single-value metrics
+      - match: 'servers\.([^.]*)\.zfs_arc\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arc_$${2}"
+        labels:
+          hostname: "$${1}"
+      # ZFS ARC v2 ratios
+      - match: 'servers\.([^.]*)\.zfs_arc_v2\.arcstat_ratio_([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arcstat_ratio"
+        labels:
+          hostname: "$${1}"
+          category: "$${2}"
+          type: "$${3}"
+      # ZFS ARC v2 raw gauges
+      - match: 'servers\.([^.]*)\.zfs_arc_v2\.gauge_arcstats_raw_([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arcstat_raw"
+        labels:
+          hostname: "$${1}"
+          category: "$${2}"
+          type: "$${3}"
+      # ZFS ARC v2 other
+      - match: 'servers\.([^.]*)\.zfs_arc_v2\.gauge_arcstats_raw\.([^.]*)'
+        match_type: regex
+        name: "truenas_zfs_arcstat_raw"
+        labels:
+          hostname: "$${1}"
+          category: "l2"
+          type: "$${2}"
+      # CTL (iSCSI/FC target) stats
+      - match: 'servers\.([^.]*)\.ctl\.([^.]*)\.([^.]*)\.([^.]*)'
+        match_type: regex
+        name: "truenas_ctl_$${3}"
+        labels:
+          hostname: "$${1}"
+          target: "$${2}"
+          direction: "$${4}"
