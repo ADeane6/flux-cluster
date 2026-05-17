@@ -68,9 +68,10 @@ data:
       # GEOM stats (FreeBSD disk stats)
       - match: 'servers\.([^.]*)\.geom_stat\.([^.]*)\.([^.]*)'
         match_type: regex
-        name: "truenas_geom_$${2}"
+        name: "truenas_geom_stat"
         labels:
           hostname: "$${1}"
+          metric: "$${2}"
           disk: "$${3}"
       # Filesystem (df)
       - match: 'servers\.([^.]*)\.df\.([^.]*)\.df_complex\.([^.]*)'
@@ -182,9 +183,10 @@ data:
       # ZFS ARC other single-value metrics
       - match: 'servers\.([^.]*)\.zfs_arc\.([^.]*)'
         match_type: regex
-        name: "truenas_zfs_arc_$${2}"
+        name: "truenas_zfs_arc_misc"
         labels:
           hostname: "$${1}"
+          type: "$${2}"
       # ZFS ARC v2 ratios
       - match: 'servers\.([^.]*)\.zfs_arc_v2\.arcstat_ratio_([^.]*)\.([^.]*)'
         match_type: regex
@@ -212,8 +214,9 @@ data:
       # CTL (iSCSI/FC target) stats
       - match: 'servers\.([^.]*)\.ctl\.([^.]*)\.([^.]*)\.([^.]*)'
         match_type: regex
-        name: "truenas_ctl_$${3}"
+        name: "truenas_ctl"
         labels:
           hostname: "$${1}"
           target: "$${2}"
+          metric: "$${3}"
           direction: "$${4}"
