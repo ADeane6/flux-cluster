@@ -28,7 +28,6 @@ spec:
     args:
       - --graphite.mapping-config=/config/graphite_mapping.yaml
       - --graphite.listen-address=:2003
-      - --log.level=debug
     service:
       main:
         ports:
