@@ -17,3 +17,4 @@ resources:
   - ./minecraft-server-charts.yaml
   - ./grafana-charts.yaml  # includes both grafana and grafana-community repos
   - ./netdata-charts.yaml
+  - ./prometheus-community-charts.yaml
