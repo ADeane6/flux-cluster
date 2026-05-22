@@ -34,6 +34,28 @@ data:
 
     loki.source.kubernetes "pods" {
       targets    = discovery.relabel.pods.output
+      forward_to = [loki.process.pod_level.receiver]
+    }
+
+    // Extract log level from klog format used by k8s system components
+    // (calico-typha, metallb, etc.) where Loki auto-detection fails.
+    // Lines not matching klog pass through untouched for Loki auto-detection.
+    loki.process "pod_level" {
+      stage.regex {
+        expression = "^(?P<klog_level>[IWEF])\\d{4} "
+      }
+
+      stage.template {
+        source = "klog_level"
+        template = "{{ if eq .klog_level \"I\" }}info{{ else if eq .klog_level \"W\" }}warn{{ else if eq .klog_level \"E\" }}error{{ else if eq .klog_level \"F\" }}fatal{{ end }}"
+      }
+
+      stage.structured_metadata {
+        values = {
+          detected_level = "klog_level",
+        }
+      }
+
       forward_to = [loki.write.default.receiver]
     }
 
