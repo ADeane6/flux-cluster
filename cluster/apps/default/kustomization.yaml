@@ -21,6 +21,7 @@ resources:
   - ./maintainerr
   - ./sonarr
   - ./radarr
+  - ./plex
   - ./kometa
   - ./plex-trakt-sync
   - ./notifiarr
