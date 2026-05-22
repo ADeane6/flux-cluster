@@ -58,7 +58,10 @@ spec:
                   "$LOG_DIR/Plex Media Scanner Analysis.log" \
                   "$LOG_DIR/Plex Media Scanner Credits.log" \
                   "$LOG_DIR/Plex Crash Uploader.log" \
-                  2>/dev/null
+                  2>/dev/null | awk '
+                /^==> .* <==/ { f=$0; gsub(/.*\//, "", f); gsub(/ <==/, "", f); next }
+                { print "[" f "] " $0 }
+                '
     service:
       main:
         controller: main
