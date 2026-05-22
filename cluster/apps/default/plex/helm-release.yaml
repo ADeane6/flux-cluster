@@ -32,7 +32,7 @@ spec:
         containers:
           main:
             image:
-              repository: plexinc/pms-docker
+              repository: lscr.io/linuxserver/plex
               tag: latest
             env:
               TZ: "Ireland/Dublin"
