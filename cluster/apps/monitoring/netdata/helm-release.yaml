@@ -114,14 +114,18 @@ spec:
           memory: 256Mi
         limits:
           memory: 512Mi
-      extraVolumes:
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
-      extraVolumeMounts:
-        - name: dev-dri
-          mountPath: /dev/dri
-      podSecurityContext:
-        supplementalGroups:
-          - 39   # video
-          - 105  # render
+      configs:
+        go.d:
+          enabled: true
+          path: /etc/netdata/go.d.conf
+          data: |
+            modules:
+              prometheus: yes
+        go.d-intel-gpu:
+          enabled: true
+          path: /etc/netdata/go.d/prometheus.conf
+          data: |
+            jobs:
+              - name: intel_gpu
+                url: http://10.0.0.1:9550/metrics
+                update_every: 5
