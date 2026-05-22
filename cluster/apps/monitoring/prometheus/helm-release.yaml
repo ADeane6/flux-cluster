@@ -58,3 +58,18 @@ spec:
           - targets:
               - netdata.monitoring.svc.cluster.local:19999
         scrape_interval: 30s
+      - job_name: intel-gpu
+        static_configs:
+          - targets:
+              - 10.0.0.1:9550
+        scrape_interval: 5s
+      - job_name: exportarr-radarr
+        static_configs:
+          - targets:
+              - exportarr-radarr.default.svc.cluster.local:9707
+        scrape_interval: 60s
+      - job_name: exportarr-sonarr
+        static_configs:
+          - targets:
+              - exportarr-sonarr.default.svc.cluster.local:9708
+        scrape_interval: 60s

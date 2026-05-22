@@ -41,7 +41,6 @@ spec:
               PUID: "353"
               PGID: "353"
               ADVERTISE_IP: "http://10.0.0.22:32400/"
-              ALLOWED_NETWORKS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
               # PLEX_CLAIM: ""  # One-time token from https://plex.tv/claim
           log-tailer:
             image:
