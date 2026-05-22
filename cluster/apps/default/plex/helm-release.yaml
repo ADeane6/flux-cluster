@@ -34,6 +34,8 @@ spec:
             image:
               repository: lscr.io/linuxserver/plex
               tag: latest
+            securityContext:
+              privileged: true
             env:
               TZ: "Ireland/Dublin"
               PUID: "353"
