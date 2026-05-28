@@ -16,6 +16,18 @@ spec:
       template:
         spec:
           initContainers:
+            - name: log-tailer
+              restartPolicy: Always
+              image: busybox
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  while [ ! -f /config/logs/meta.log ]; do sleep 1; done
+                  tail -f /config/logs/meta.log
+              volumeMounts:
+                - name: config
+                  mountPath: /config
             - name: config-init
               image: busybox
               command:
