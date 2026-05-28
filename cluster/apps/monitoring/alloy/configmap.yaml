@@ -38,6 +38,23 @@ data:
         source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
         target_label  = "app"
       }
+      // Pods with a log-tailer sidecar have two log streams: the tailer
+      // (structured, with levels) and the main container (raw stdout).
+      // Tag raw duplicates so dashboards can exclude them by default.
+      // To add a new app: add its main container name to the regex below.
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        regex         = "log-tailer"
+        target_label  = "log_source"
+        replacement   = "structured"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name", "__meta_kubernetes_pod_container_name"]
+        separator     = "/"
+        regex         = "plex/main|kometa/kometa"
+        target_label  = "log_source"
+        replacement   = "duplicate"
+      }
     }
 
     loki.source.kubernetes "pods" {
