@@ -167,42 +167,62 @@ data:
     // Extracts level from formats where Loki auto-detection fails:
     //   klog:        "E0522 16:35:27 ..." → error
     //   zigbee2mqtt: "[2026-05-25 16:57:53] warning: ..." → warn
-    // Non-matching lines pass through for Loki auto-detection.
+    // Non-matching lines pass through UNTOUCHED for Loki auto-detection.
+    //
+    // IMPORTANT: stage.regex only adds keys to extracted data when matched.
+    // stage.replace with source is a no-op if the key doesn't exist.
+    // stage.structured_metadata is a no-op if the key doesn't exist.
+    // This ensures we never override Loki's auto-detection with empty values.
+    // DO NOT use stage.template here - it always creates the key even if empty.
     loki.process "level_extract" {
       // Strip ANSI color codes so Loki auto-detection works on clean text.
-      // Fixes home-assistant, overseerr, and any app that uses colored output.
       stage.replace {
         expression = "\u001b\\[[0-9;]*m"
         replace    = ""
       }
 
-      // klog: I/W/E/F prefix (calico-typha, metallb, k3s journal)
+      // klog: extract level letter, key only exists if regex matches
       stage.regex {
-        expression = "^(?P<klog_level>[IWEF])\\d{4} "
+        expression = "^(?P<detected_level>[IWEF])\\d{4} "
       }
-      stage.template {
-        source = "klog_level"
-        template = "{{ if eq .klog_level \"I\" }}info{{ else if eq .klog_level \"W\" }}warn{{ else if eq .klog_level \"E\" }}error{{ else if eq .klog_level \"F\" }}fatal{{ end }}"
+      stage.replace {
+        source     = "detected_level"
+        expression = "^I$"
+        replace    = "info"
       }
-
-      // zigbee2mqtt / bracketed timestamp: [timestamp] level:
-      stage.regex {
-        expression = "^\\[\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}\\] (?P<bracket_level>debug|info|warning|warn|error|critical|fatal):"
+      stage.replace {
+        source     = "detected_level"
+        expression = "^W$"
+        replace    = "warn"
       }
-      stage.template {
-        source = "bracket_level"
-        template = "{{ if eq .bracket_level \"warning\" }}warn{{ else }}{{ .bracket_level }}{{ end }}"
+      stage.replace {
+        source     = "detected_level"
+        expression = "^E$"
+        replace    = "error"
       }
-
-      // Coalesce: use whichever format matched
-      stage.template {
-        source = "extracted_level"
-        template = "{{ or .klog_level .bracket_level }}"
+      stage.replace {
+        source     = "detected_level"
+        expression = "^F$"
+        replace    = "fatal"
       }
-
       stage.structured_metadata {
         values = {
-          detected_level = "extracted_level",
+          detected_level = "detected_level",
+        }
+      }
+
+      // zigbee2mqtt / bracketed timestamp: key only exists if regex matches
+      stage.regex {
+        expression = "^\\[\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}\\] (?P<detected_level>debug|info|warning|warn|error|critical|fatal):"
+      }
+      stage.replace {
+        source     = "detected_level"
+        expression = "^warning$"
+        replace    = "warn"
+      }
+      stage.structured_metadata {
+        values = {
+          detected_level = "detected_level",
         }
       }
 
