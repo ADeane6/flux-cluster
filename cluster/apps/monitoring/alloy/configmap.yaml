@@ -6,7 +6,15 @@ metadata:
   namespace: monitoring
 data:
   config.alloy: |
-    // Discover and collect all k8s pod logs
+    // ============================================================
+    // UNIFIED LABEL STRATEGY
+    // All sources set these labels consistently:
+    //   app             - identifies the service/device (radarr, Cloud-Gateway-Ultra, k3s, plex, etc.)
+    //   detected_level  - structured metadata: error, warn, info, debug, etc.
+    //   source          - where the log came from: "kubernetes", "syslog", "journal"
+    // ============================================================
+
+    // ----- K8S POD LOGS -----
     discovery.kubernetes "pods" {
       role = "pod"
     }
@@ -34,20 +42,124 @@ data:
 
     loki.source.kubernetes "pods" {
       targets    = discovery.relabel.pods.output
-      forward_to = [loki.process.pod_level.receiver]
+      forward_to = [loki.process.level_extract.receiver]
     }
 
-    // Extract log level from formats where Loki auto-detection fails.
-    // Loki scans the entire line for level keywords, so a "warning" log
-    // containing the word "error" in the message body gets misclassified.
-    // Setting detected_level as structured metadata overrides auto-detection.
-    //
-    // Supported formats:
-    //   klog:        "W0522 16:35:27 ..." (calico-typha, metallb, etc.)
-    //   zigbee2mqtt: "[2026-05-25 16:57:53] warning: ..."
-    //   bracketed:   "[timestamp] [WARNING] ..." or similar
-    loki.process "pod_level" {
-      // klog: I/W/E/F prefix
+    // ----- SYSLOG (network devices, TrueNAS) -----
+    loki.relabel "syslog_labels" {
+      forward_to = []
+
+      rule {
+        source_labels = ["__syslog_message_hostname"]
+        target_label  = "device"
+      }
+      rule {
+        source_labels = ["__syslog_connection_ip_address"]
+        target_label  = "device_ip"
+      }
+      // app = device hostname (Cloud-Gateway-Ultra, freenas, U6Lite, etc.)
+      rule {
+        source_labels = ["__syslog_message_hostname"]
+        target_label  = "app"
+      }
+      rule {
+        source_labels = ["__syslog_message_severity"]
+        target_label  = "severity"
+      }
+      rule {
+        source_labels = ["__syslog_message_facility"]
+        target_label  = "facility"
+      }
+    }
+
+    loki.source.syslog "external" {
+      listener {
+        address       = "0.0.0.0:514"
+        protocol      = "udp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
+      }
+      listener {
+        address       = "0.0.0.0:1514"
+        protocol      = "tcp"
+        syslog_format = "rfc3164"
+        labels        = { source = "syslog" }
+      }
+      relabel_rules = loki.relabel.syslog_labels.rules
+      forward_to    = [loki.process.syslog_level.receiver]
+    }
+
+    // Map syslog severity to detected_level structured metadata
+    // Syslog severity values: error, warning, notice, informational, debug
+    loki.process "syslog_level" {
+      stage.labels {
+        values = {
+          sev = "severity",
+        }
+      }
+      stage.template {
+        source = "extracted_level"
+        template = "{{ if eq .sev \"error\" }}error{{ else if eq .sev \"warning\" }}warn{{ else if eq .sev \"notice\" }}info{{ else if eq .sev \"informational\" }}info{{ else if eq .sev \"debug\" }}debug{{ else if eq .sev \"crit\" }}crit{{ else if eq .sev \"alert\" }}crit{{ else if eq .sev \"emerg\" }}crit{{ else }}{{ .sev }}{{ end }}"
+      }
+      stage.structured_metadata {
+        values = {
+          detected_level = "extracted_level",
+        }
+      }
+      forward_to = [loki.write.default.receiver]
+    }
+
+    // ----- HOST JOURNAL (kernel, systemd, k3s) -----
+    loki.relabel "journal_labels" {
+      forward_to = []
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+      rule {
+        source_labels = ["__journal__transport"]
+        target_label  = "transport"
+      }
+      rule {
+        source_labels = ["__journal_priority_keyword"]
+        target_label  = "level"
+      }
+      rule {
+        source_labels = ["__journal__hostname"]
+        target_label  = "host"
+      }
+      // app = systemd unit name without .service suffix
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        regex         = "(.*)\\.service"
+        replacement   = "$${1}"
+        target_label  = "app"
+      }
+    }
+
+    loki.source.journal "host" {
+      path          = "/var/log/journal"
+      labels        = { source = "journal" }
+      relabel_rules = loki.relabel.journal_labels.rules
+      forward_to    = [loki.process.level_extract.receiver]
+    }
+
+    // ----- SHARED LEVEL EXTRACTION -----
+    // Used by both k8s pods and journal logs.
+    // Extracts level from formats where Loki auto-detection fails:
+    //   klog:        "E0522 16:35:27 ..." → error
+    //   zigbee2mqtt: "[2026-05-25 16:57:53] warning: ..." → warn
+    // Non-matching lines pass through for Loki auto-detection.
+    loki.process "level_extract" {
+      // Strip ANSI color codes so Loki auto-detection works on clean text.
+      // Fixes home-assistant, overseerr, and any app that uses colored output.
+      stage.replace {
+        expression = "\u001b\\[[0-9;]*m"
+        replace    = ""
+      }
+
+      // klog: I/W/E/F prefix (calico-typha, metallb, k3s journal)
       stage.regex {
         expression = "^(?P<klog_level>[IWEF])\\d{4} "
       }
@@ -56,7 +168,7 @@ data:
         template = "{{ if eq .klog_level \"I\" }}info{{ else if eq .klog_level \"W\" }}warn{{ else if eq .klog_level \"E\" }}error{{ else if eq .klog_level \"F\" }}fatal{{ end }}"
       }
 
-      // zigbee2mqtt / bracketed timestamp format: [timestamp] level:
+      // zigbee2mqtt / bracketed timestamp: [timestamp] level:
       stage.regex {
         expression = "^\\[\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}\\] (?P<bracket_level>debug|info|warning|warn|error|critical|fatal):"
       }
@@ -80,81 +192,7 @@ data:
       forward_to = [loki.write.default.receiver]
     }
 
-    // Relabel rules to promote __syslog_ internal labels
-    // These rules run INSIDE loki.source.syslog before labels are stripped
-    loki.relabel "syslog_labels" {
-      forward_to = []
-
-      rule {
-        source_labels = ["__syslog_message_hostname"]
-        target_label  = "device"
-      }
-      rule {
-        source_labels = ["__syslog_connection_ip_address"]
-        target_label  = "device_ip"
-      }
-      rule {
-        source_labels = ["__syslog_message_app_name"]
-        target_label  = "app"
-      }
-      rule {
-        source_labels = ["__syslog_message_severity"]
-        target_label  = "severity"
-      }
-      rule {
-        source_labels = ["__syslog_message_facility"]
-        target_label  = "facility"
-      }
-    }
-
-    // Syslog listener for external devices (all RFC 3164)
-    loki.source.syslog "external" {
-      listener {
-        address       = "0.0.0.0:514"
-        protocol      = "udp"
-        syslog_format = "rfc3164"
-        labels        = { source = "syslog" }
-      }
-      listener {
-        address       = "0.0.0.0:1514"
-        protocol      = "tcp"
-        syslog_format = "rfc3164"
-        labels        = { source = "syslog" }
-      }
-      relabel_rules = loki.relabel.syslog_labels.rules
-      forward_to    = [loki.write.default.receiver]
-    }
-
-    // Host journal logs (kernel, systemd, dmesg)
-    loki.relabel "journal_labels" {
-      forward_to = []
-
-      rule {
-        source_labels = ["__journal__systemd_unit"]
-        target_label  = "unit"
-      }
-      rule {
-        source_labels = ["__journal__transport"]
-        target_label  = "transport"
-      }
-      rule {
-        source_labels = ["__journal_priority_keyword"]
-        target_label  = "level"
-      }
-      rule {
-        source_labels = ["__journal__hostname"]
-        target_label  = "host"
-      }
-    }
-
-    loki.source.journal "host" {
-      path          = "/var/log/journal"
-      labels        = { source = "journal" }
-      relabel_rules = loki.relabel.journal_labels.rules
-      forward_to    = [loki.write.default.receiver]
-    }
-
-    // Write to Loki
+    // ----- LOKI WRITER -----
     loki.write "default" {
       endpoint {
         url = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
