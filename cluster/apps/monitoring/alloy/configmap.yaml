@@ -176,8 +176,10 @@ data:
     // DO NOT use stage.template here - it always creates the key even if empty.
     loki.process "level_extract" {
       // Strip ANSI color codes so Loki auto-detection works on clean text.
+      // stage.replace replaces capture group content, not the full match.
+      // Wrap the entire ANSI sequence in a group to replace it with empty.
       stage.replace {
-        expression = "\\x1b\\[[0-9;]*m"
+        expression = "(\\x1b\\[[0-9;]*m)"
         replace    = ""
       }
 
@@ -192,7 +194,7 @@ data:
         }
       }
       stage.replace {
-        expression = "^\\[[^\\]]+\\.log\\] "
+        expression = "(^\\[[^\\]]+\\.log\\] )"
         replace    = ""
       }
 
