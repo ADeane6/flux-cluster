@@ -14,6 +14,9 @@ spec:
       activeDeadlineSeconds: 3600
       ttlSecondsAfterFinished: 14400
       template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kometa
         spec:
           initContainers:
             - name: log-tailer
@@ -24,7 +27,7 @@ spec:
                 - -c
                 - |
                   while [ ! -f /config/logs/meta.log ]; do sleep 1; done
-                  tail -f /config/logs/meta.log
+                  tail -f /config/logs/meta.log | awk '{ print "[meta.log] " $0 }'
               volumeMounts:
                 - name: config
                   mountPath: /config

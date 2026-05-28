@@ -181,6 +181,21 @@ data:
         replace    = ""
       }
 
+      // Extract log file name from log-tailer prefix: [Plex Media Server.log] ...
+      // Then strip the prefix from the stored log line so it's clean.
+      stage.regex {
+        expression = "^\\[(?P<logfile>[^\\]]+\\.log)\\] "
+      }
+      stage.structured_metadata {
+        values = {
+          logfile = "logfile",
+        }
+      }
+      stage.replace {
+        expression = "^\\[[^\\]]+\\.log\\] "
+        replace    = ""
+      }
+
       // klog: extract level letter, key only exists if regex matches
       stage.regex {
         expression = "^(?P<detected_level>[IWEF])\\d{4} "
