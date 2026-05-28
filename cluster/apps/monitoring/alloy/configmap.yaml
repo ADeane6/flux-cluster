@@ -177,7 +177,7 @@ data:
     loki.process "level_extract" {
       // Strip ANSI color codes so Loki auto-detection works on clean text.
       stage.replace {
-        expression = "\u001b\\[[0-9;]*m"
+        expression = "\\x1b\\[[0-9;]*m"
         replace    = ""
       }
 
