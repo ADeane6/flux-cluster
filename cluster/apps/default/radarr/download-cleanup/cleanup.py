@@ -209,6 +209,7 @@ def _fuzzy_match_title(folder_name, items, title_key):
 def _normalize(s):
     """Normalize a string for fuzzy matching."""
     s = s.lower()
+    s = re.sub(r"'s\b", "s", s)  # Possessives: schindler's -> schindlers
     s = re.sub(r"[^a-z0-9\s]", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
     for term in ["2160p", "1080p", "720p", "uhd", "bluray", "blu ray", "webrip",
