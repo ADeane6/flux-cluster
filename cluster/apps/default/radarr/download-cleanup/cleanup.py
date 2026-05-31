@@ -17,8 +17,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+LOG_LEVELS = {"debug": 0, "information": 1, "warning": 2, "error": 3, "fatal": 4}
+MIN_LOG_LEVEL = LOG_LEVELS.get(os.environ.get("LOG_LEVEL", "information").lower(), 1)
+
+
 def clef_log(level, message_template, **kwargs):
     """Emit a CLEF-formatted JSON log line to stdout."""
+    if LOG_LEVELS.get(level, 1) < MIN_LOG_LEVEL:
+        return
     entry = {
         "@t": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         "@l": level,
@@ -181,16 +187,19 @@ def _get_sonarr_context(config, file_path):
 
 
 def _fuzzy_match_title(folder_name, items, title_key):
-    """Simple fuzzy match: normalize and find the best substring match."""
+    """Fuzzy match: normalize and find the best word-boundary substring match."""
     normalized = _normalize(folder_name)
+    words = normalized.split()
     best_match = None
     best_score = 0
     for item in items:
         title = _normalize(item.get(title_key, ""))
-        if not title:
+        if not title or len(title) < 3:
             continue
-        if title in normalized or normalized in title:
-            score = len(title)
+        title_words = title.split()
+        # Check if all words in the title appear in the folder name
+        if all(w in words for w in title_words):
+            score = len(title_words)
             if score > best_score:
                 best_score = score
                 best_match = item
