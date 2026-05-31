@@ -1,0 +1,64 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sonarr-download-cleanup
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 14400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: download-cleanup
+        spec:
+          containers:
+            - name: cleanup
+              image: python:3-alpine
+              command:
+                - python3
+                - /scripts/cleanup.py
+              env:
+                - name: DOWNLOAD_DIR
+                  value: "/mnt/tv_shows/download"
+                - name: API_URL
+                  value: "http://sonarr:8989"
+                - name: API_TYPE
+                  value: "sonarr"
+                - name: API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: sonarr-cleanup-secrets
+                      key: API_KEY
+                - name: MIN_AGE_HOURS
+                  value: "336"
+                - name: MAX_DELETIONS
+                  value: "20"
+                - name: MIN_FILE_SIZE_MB
+                  value: "500"
+                - name: LOG_LEVEL
+                  value: "information"
+                - name: DRY_RUN
+                  value: "true"
+                - name: TZ
+                  value: "Ireland/Dublin"
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tv-shows
+                  mountPath: /mnt/tv_shows
+          restartPolicy: Never
+          volumes:
+            - name: scripts
+              configMap:
+                name: sonarr-download-cleanup-script
+            - name: tv-shows
+              persistentVolumeClaim:
+                claimName: sonarr-tv-shows
