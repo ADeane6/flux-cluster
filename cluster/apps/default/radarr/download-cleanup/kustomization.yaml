@@ -4,7 +4,7 @@ resources:
   - cronjob.yaml
   - secret.sops.yaml
 configMapGenerator:
-  - name: radarr-download-cleanup-scrip
+  - name: radarr-download-cleanup-script
     namespace: default
     files:
       - cleanup.py
