@@ -1,0 +1,62 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: radarr-download-cleanup
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 14400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: download-cleanup
+        spec:
+          containers:
+            - name: cleanup
+              image: python:3-alpine
+              command:
+                - python3
+                - /scripts/cleanup.py
+              env:
+                - name: DOWNLOAD_DIR
+                  value: "/mnt/movies/download"
+                - name: API_URL
+                  value: "http://radarr:7878"
+                - name: API_TYPE
+                  value: "radarr"
+                - name: API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: radarr-cleanup-secrets
+                      key: API_KEY
+                - name: MIN_AGE_HOURS
+                  value: "336"
+                - name: MAX_DELETIONS
+                  value: "20"
+                - name: MIN_FILE_SIZE_MB
+                  value: "500"
+                - name: DRY_RUN
+                  value: "true"
+                - name: TZ
+                  value: "Ireland/Dublin"
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: movies
+                  mountPath: /mnt/movies
+          restartPolicy: Never
+          volumes:
+            - name: scripts
+              configMap:
+                name: radarr-download-cleanup-script
+            - name: movies
+              persistentVolumeClaim:
+                claimName: radarr-movies
