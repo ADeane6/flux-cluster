@@ -194,7 +194,7 @@ data:
         }
       }
       stage.replace {
-        expression = "(^\\[[^\\]]+\\.log\\] )"
+        expression = "(\\[[^\\]]+\\.log\\] )"
         replace    = ""
       }
 
