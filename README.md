@@ -4,6 +4,40 @@ Monitoring impl: `claude --resume "flux-cluster"`
 
 # Extra notes
 
+## Node Crash Investigation
+
+If `tomnuc.home` hangs and requires a hard reset, work through these in order after reboot:
+
+```bash
+# 1. Confirm which boots are available
+journalctl --list-boots
+
+# 2. Check last kernel messages — look for OOM kills, lockup warnings, panics
+journalctl -b -1 -k | tail -100
+
+# 3. Check for thermal or hardware errors
+journalctl -b -1 | grep -i "thermal\|throttl\|mce\|machine.check\|hardware.error"
+
+# 4. Check for OOM kills
+journalctl -b -1 | grep -i "oom\|killed process\|out of memory"
+
+# 5. Check watchdog daemon logs
+journalctl -b -1 -u watchdog.service
+
+# 6. Check pstore for kernel panic data (if panic occurred)
+ls /sys/fs/pstore/
+cat /sys/fs/pstore/dmesg-efi-*
+
+# 7. Check for a kdump crash dump
+ls /var/crash/
+
+# 8. Check TrueNAS watchdog log for when the node went dark
+cat /mnt/all/config/scripts/nuc-watchdog.log
+```
+
+Full crash capture setup details: `docs/nuc-crash-capture-setup.md`
+Full diagnosis guide: `docs/nuc-hang-diagnosis.md`
+
 ## SOPS
 
 ```

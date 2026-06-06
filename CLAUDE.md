@@ -95,6 +95,31 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 
 ### Known Issues (Resolved)
 - **2026-05-17 crash:** Node locked up due to NFS hard mount hang, compounded by degraded 100Mbps network link (bad cable). iowait climbed from 14% to 39% over an hour before the node became unresponsive. Fix: replaced cable (1Gbps restored), changed NFS mounts from hard to soft.
+- **2026-06-04 crash:** Node hard-locked at ~23:31 UTC, down 36.5 hours. Last kernel event: Netdata child pod OOM-killed at 23:30:55 (go.d.plugin exceeded 512Mi cgroup limit). Disk was at 100% utilisation, iowait 36.8%. Root cause of actual kernel lock unknown — no pstore/kdump configured at the time. Fix: bumped Netdata child memory limit to 1Gi; crash capture infrastructure added (see below).
+
+### Crash Capture Infrastructure
+
+Set up on `tomnuc.home` to capture data from the next hang:
+
+- **pstore** (`pstore.backend=efi efi_pstore_disable_old=0`): writes kernel ring buffer to EFI NVRAM on panic, survives hard reset. Check `/sys/fs/pstore/` after reboot.
+- **NMI watchdog** (`nmi_watchdog=1`, `hardlockup_panic=1` via sysctl, `softlockup_panic=1`): forces a kernel panic if a CPU freezes for >10s, enabling pstore/kdump to capture it.
+- **kdump** (`crashkernel=512M`): kexec crash kernel saves full memory dump to `/var/crash/` on panic. Analyse with `crash` + `debuginfo-install kernel-$(uname -r)`.
+- **Software watchdog** (`watchdog` daemon): reboots if load average >80 (1min) or free memory <64MB. Pings router (10.0.3.254) to detect NIC failure. Required `setcap cap_net_raw+ep /usr/sbin/watchdog` for ping to work.
+- **TrueNAS watchdog** (`/mnt/all/config/scripts/nuc-watchdog.sh`, cron every 2min): pings NUC, then SSH port check, then 5-min recheck before power-cycling via ESPHome smart plug (10.0.1.89). Logs to `/mnt/all/config/scripts/nuc-watchdog.log`.
+
+Full setup guide: `docs/nuc-crash-capture-setup.md`
+
+### Post-Hang Investigation Checklist
+
+After the next hard lock and reboot:
+1. `journalctl --list-boots` — confirm boot -1 logs are available
+2. `journalctl -b -1 -k | tail -100` — last kernel messages before crash
+3. `journalctl -b -1 | grep -i "oom\|killed process"` — OOM kills
+4. `journalctl -b -1 | grep -i "thermal\|mce\|machine.check"` — hardware errors
+5. `ls /sys/fs/pstore/` — kernel panic data (if panic occurred)
+6. `ls /var/crash/` — kdump memory dump (if panic occurred)
+7. `cat /mnt/all/config/scripts/nuc-watchdog.log` — when node went dark from TrueNAS perspective
+8. Netdata/Loki — disk I/O, load, cgroup memory in the hour before the crash
 
 ## Repo Structure
 
