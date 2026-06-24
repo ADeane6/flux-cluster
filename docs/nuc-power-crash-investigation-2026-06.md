@@ -1,8 +1,10 @@
 # NUC Power Crash Investigation (June 2026)
 
+**Status: ONGOING.** The failure mode is identified (instant, unlogged power loss to the NUC) and a prime suspect named (internal PSU / DC input), but the root cause is not confirmed. Confirmation needs the next event captured with the power-side telemetry that is now in place (see Next steps). We can't yet separate an internal PSU fault from a brief mains sag without that trace. The mitigations (auto power-on, split plugs, plug monitor) are done; the diagnosis is not. When the next event lands, work [nuc-outage-runbook.md](nuc-outage-runbook.md).
+
 ## Summary
 
-`tomnuc.home` died three times over Fri 19 / Sat 20 June 2026, then sat dead for ~40h until it was manually rebooted on Sun 21 June. After investigation the cause is an instant, unlogged power loss localised to the NUC itself (most likely the PSU / DC power input), not a software hang, not a circuit/mains outage, and not the crash-capture watchdog.
+`tomnuc.home` died three times over Fri 19 / Sat 20 June 2026, then sat dead for ~40h until it was manually rebooted on Sun 21 June. After investigation the leading cause is an instant, unlogged power loss localised to the NUC itself (most likely the PSU / DC power input), not a software hang, not a circuit/mains outage, and not the crash-capture watchdog. This is the prime suspect, not a confirmed root cause.
 
 The crash-capture infrastructure added after the June 4 hang (pstore, kdump, lockup panic) captured nothing, because it is built to catch a kernel panic and this failure mode removes power before the kernel ever reaches the panic path. The right instrument for this class of fault is power-side telemetry, which we don't currently retain off-NUC (see Monitoring Gap).
 
@@ -68,14 +70,15 @@ The ESPHome plugs don't retain history themselves, so the data has to be pushed/
 ## Next steps
 
 1. ~~Split the NUC and TrueNAS onto independent plugs so they can be observed separately and one can't take the other down.~~ Done (24 June 2026).
-2. Enable the NUC plug's voltage sensor (if the chip supports it) and sample fast (~1s). This is what distinguishes the three remaining possibilities:
+2. ~~Enable the NUC plug's voltage sensor (if the chip supports it) and sample fast (~1s).~~ Done (24 June 2026). The plug reports voltage (~242V), and it's being recorded. Note the real resolution is capped by the ESPHome `update_interval` (in the `esphome_config` repo), not the 2s poll, so a sub-second brownout may still be missed. This is what distinguishes the three remaining possibilities:
    - relay reported on, draw drops to 0W instantly -> internal PSU / board fault (expected)
    - relay off / plug stops reporting -> plug or upstream cut power
    - input voltage sags just before draw collapses -> mains brownout the PSU couldn't ride through
-3. Record that plug telemetry on TrueNAS (simplest: a small poller on TrueNAS hitting the ESPHome web server REST endpoint every 1-2s, appending timestamp/volts/watts to the pool). MQTT to a broker on TrueNAS or a Prometheus scrape are heavier alternatives.
+3. ~~Record that plug telemetry on TrueNAS.~~ Done (24 June 2026). A poller hits the plug's ESPHome REST endpoint every 2s and appends to a daily CSV on the pool, reboot-persistent via a TrueNAS Post-Init entry. See [nuc-plug-monitor README](../Local-apps/nuc-plug-monitor/README.md). This is the authoritative power-side record, on the one box proven to stay up.
 4. ~~Set the NUC BIOS to power on after AC loss, so it self-recovers instead of sitting dead for ~40h.~~ Done (24 June 2026). The BIOS has no such option, so it's handled in software by clearing the PCH `GEN_PMCON_A` AFTERG3 bit at every boot. See [nuc-auto-power-on.md](nuc-auto-power-on.md).
 5. After the next event, check the NUC BIOS / board event log (logs unexpected power loss independently of the OS).
 6. Exclusion checks for hygiene:
    - `sudo smartctl -a /dev/sda` (check `Unexpect_Power_Loss_Ct` / `Power-Off_Retract_Count`, which should have bumped by ~2 over the weekend if it lost power, plus reallocated sectors and CRC errors)
    - memtest86+ overnight to definitively clear the RAM
 7. Likely fix: swap the PSU / DC barrel jack, and put the NUC on a UPS so a sag or a flaky supply can't drop it (and the UPS gives an independent power-event log).
+8. ~~Add detection/alerting for unattended events.~~ Done (24 June 2026). The TrueNAS watchdog (`nuc-watchdog.sh`) now sends Discord alerts when it power-cycles the NUC, again if the cycle didn't recover it, and an all-clear when it's back. See the "Detecting an event you weren't awake for" section of [nuc-outage-runbook.md](nuc-outage-runbook.md). Caveat: only catches events long enough to cross the watchdog's ~6-min fail threshold; shorter blips show only in the plug log.

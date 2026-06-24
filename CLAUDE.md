@@ -115,7 +115,9 @@ The board (no-name Whiskey Lake mini-PC, Cannon Point-LP PCH, BIOS `GWHL4 5.04`)
 
 ### Post-Hang Investigation Checklist
 
-After the next hard lock and reboot:
+For any unexpected reboot or outage, work `docs/nuc-outage-runbook.md` (full checklist + how to detect a self-recovered event + plug-trace interpretation). The power-loss investigation is still ONGOING (`docs/nuc-power-crash-investigation-2026-06.md`); since the NUC now auto-recovers, night-time events can be silent, so check the TrueNAS plug log after any blip.
+
+Quick version, after the next hard lock and reboot:
 1. `journalctl --list-boots` — confirm boot -1 logs are available
 2. `journalctl -b -1 -k | tail -100` — last kernel messages before crash
 3. `journalctl -b -1 | grep -i "oom\|killed process"` — OOM kills
