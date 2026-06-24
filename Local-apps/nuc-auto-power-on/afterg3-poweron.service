@@ -1,0 +1,10 @@
+[Unit]
+Description=Power on after AC loss (clear PCH GEN_PMCON_A AFTERG3_EN)
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/afterg3-poweron.py
+
+[Install]
+WantedBy=multi-user.target

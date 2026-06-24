@@ -67,13 +67,13 @@ The ESPHome plugs don't retain history themselves, so the data has to be pushed/
 
 ## Next steps
 
-1. Split the NUC and TrueNAS onto independent plugs so they can be observed separately and one can't take the other down.
+1. ~~Split the NUC and TrueNAS onto independent plugs so they can be observed separately and one can't take the other down.~~ Done (24 June 2026).
 2. Enable the NUC plug's voltage sensor (if the chip supports it) and sample fast (~1s). This is what distinguishes the three remaining possibilities:
    - relay reported on, draw drops to 0W instantly -> internal PSU / board fault (expected)
    - relay off / plug stops reporting -> plug or upstream cut power
    - input voltage sags just before draw collapses -> mains brownout the PSU couldn't ride through
 3. Record that plug telemetry on TrueNAS (simplest: a small poller on TrueNAS hitting the ESPHome web server REST endpoint every 1-2s, appending timestamp/volts/watts to the pool). MQTT to a broker on TrueNAS or a Prometheus scrape are heavier alternatives.
-4. Set the NUC BIOS to power on after AC loss, so it self-recovers instead of sitting dead for ~40h.
+4. ~~Set the NUC BIOS to power on after AC loss, so it self-recovers instead of sitting dead for ~40h.~~ Done (24 June 2026). The BIOS has no such option, so it's handled in software by clearing the PCH `GEN_PMCON_A` AFTERG3 bit at every boot. See [nuc-auto-power-on.md](nuc-auto-power-on.md).
 5. After the next event, check the NUC BIOS / board event log (logs unexpected power loss independently of the OS).
 6. Exclusion checks for hygiene:
    - `sudo smartctl -a /dev/sda` (check `Unexpect_Power_Loss_Ct` / `Power-Off_Retract_Count`, which should have bumped by ~2 over the weekend if it lost power, plus reallocated sectors and CRC errors)

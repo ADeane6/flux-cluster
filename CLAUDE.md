@@ -109,6 +109,10 @@ Set up on `tomnuc.home` to capture data from the next hang:
 
 Full setup guide: `docs/nuc-crash-capture-setup.md`
 
+### Auto Power-On After AC Loss
+
+The board (no-name Whiskey Lake mini-PC, Cannon Point-LP PCH, BIOS `GWHL4 5.04`) has no BIOS "power on after AC loss" option, so it stayed dead for ~40h after the June 2026 power crashes. Handled in software instead: a systemd oneshot (`afterg3-poweron.service`) clears bit 0 (`SLEEP_AFTER_POWER_FAIL`) of the PCH `GEN_PMCON_A` register at `0xFE001020` on every boot (BIOS resets it each POST). Files version-controlled at `Local-apps/nuc-auto-power-on/`. Full writeup: `docs/nuc-auto-power-on.md`.
+
 ### Post-Hang Investigation Checklist
 
 After the next hard lock and reboot:
