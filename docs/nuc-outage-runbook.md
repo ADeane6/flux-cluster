@@ -37,6 +37,8 @@ Incident state (`nuc_incident_start`, `nuc_powercycle_count` in the scripts dir)
 
 Note the gap this leaves: a power blip that the NUC rides through or recovers from in under ~6 min (before the watchdog crosses its fail threshold) won't trigger an alert. For those, the TrueNAS plug log (above) is still the forensic record. If catching short events proves important, add a plug-side watcher as a second source.
 
+This all assumes TrueNAS is up to do the watching. A **whole-house power cut** takes TrueNAS down too, so it's handled separately by a cloud dead-man's switch (TrueNAS + router ping healthchecks.io; the cloud alerts when the pings stop). See [house-power-outage-detection.md](house-power-outage-detection.md).
+
 ## Post-outage checklist
 
 NUC commands run on `tomnuc.home` (`ssh personalServer`). `-b -1` is the previous boot; use the right offset if more than one boot has happened since.
