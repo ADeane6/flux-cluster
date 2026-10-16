@@ -4,6 +4,8 @@
 
 **Update 30 June 2026:** the NUC has hung four times over three days (25, 28, and twice on 30 June). Every one was a hang, not a power loss (steady voltage, non-zero draw, watchdog-recovered), and nothing was captured (no panic, no kdump). All four self-recovered via the watchdog + auto power-on. Leading suspect is the non-ECC RAM (uncleared); next step is memtest86+. Details in the Update sections below.
 
+**Update 16 October 2026:** three reboots early on the 16th (not yet investigated). The cluster then stayed down ~2.5h because of a DNS deadlock and a kubelet log flood that had been filling the disk since the May k3s upgrade. Both are fixed; see the 16 October section.
+
 ## Summary
 
 `tomnuc.home` died three times over Fri 19 / Sat 20 June 2026, then sat dead for ~40h until it was manually rebooted on Sun 21 June. After investigation the leading cause is an instant, unlogged power loss localised to the NUC itself (most likely the PSU / DC power input), not a software hang, not a circuit/mains outage, and not the crash-capture watchdog. This is the prime suspect, not a confirmed root cause.
@@ -136,6 +138,31 @@ The draw *during* the freeze varies (8W / 12.7W / 16W / 12W), which just reflect
 The pattern (silent freeze, no log, no panic, no resource cause) points at hardware rather than software. The non-ECC RAM is the leading suspect and is still uncleared: silent freezes with no log are a known RAM symptom, and non-ECC means EDAC can't report bad bits. The recovery stack self-healed all four, but that's mitigation, not a diagnosis.
 
 **Next step: memtest86+** to confirm or clear the RAM. If clean, the suspect moves to the board / CPU.
+
+## Update — 16 October 2026: cluster stuck after reboots (DNS deadlock + kubelet log flood)
+
+The node rebooted three times early on 16 Oct (journal boots end 04:28, 05:38, 05:48 UTC). The reboots themselves have **not been investigated yet**. Check the TrueNAS watchdog and plug logs per [nuc-outage-runbook.md](nuc-outage-runbook.md). This section covers why the cluster stayed broken after the node came back. Every pod sat in `FailedCreatePodSandBox` for ~2.5h.
+
+### Chain of failure
+
+1. **The root disk filled to 86%.** `/var/log/messages` had grown to 713G. rsyslog mirrors the whole journal into it, and it has never been rotated: `rsyslog-logrotate` was never installed and nothing in `/etc/logrotate.d/` covers it.
+2. **The source was a kubelet log flood.** It started with the k3s upgrade from v1.24.8 to v1.34.7 on 12 May 2026 (commit `a347787`). 794 evicted pods left over from 2022/Jan 2023 (784 of them `tigera-operator`) could no longer have their status patched: `status.qosClass: Invalid value`, because 1.34 computes QoS differently and the field is immutable. kubelet retried forever, ~25 times a second, and logged the full JSON patch every time. That's ~88k lines/hour, or ~5.3 GiB/day. Netdata shows the disk climbing linearly from 507G (27 Jul) to 818G (16 Oct), which projects back to mid-May.
+3. **Disk pressure garbage-collected the pause image.** Above kubelet's 85% image-GC threshold, kubelet tried to free ~53G every 5 min. Almost every image was in use, so the only thing it could remove was `rancher/mirrored-pause:3.6` (`sha256:6270bb605e12…`, 15 Oct 03:08 UTC).
+4. **A DNS circular dependency turned this into a deadlock.** The node's only DNS server was `10.0.0.8`, the AdGuard LoadBalancer IP, i.e. a pod on this same node. After reboot, every sandbox needed the pause image pulled from Docker Hub. That needed DNS, which needed AdGuard, which needed a sandbox.
+
+Earlier reboots never hit this because the pause image was still cached, so the DNS dependency was never exercised.
+
+### Fixes applied
+
+- **Node DNS** (host config, outside GitOps): `nmcli con mod enp1s0 ipv4.dns '10.0.0.8 1.1.1.1'`. AdGuard is preferred and public DNS is the fallback. systemd-resolved sticks with whichever server last worked, so after an AdGuard outage it stays on 1.1.1.1 until `systemctl restart systemd-resolved`.
+- **Node `/etc/hosts`**: added `10.0.0.129  freenas.home`, so kubelet's NFS mounts don't depend on AdGuard. Backup at `/etc/hosts.bak-20261016`.
+- **CoreDNS** (commit `1c0f5b5`): a `hosts` entry for `freenas.home` in the `home lan` server block, so pods (NFS, cloudflared) resolve TrueNAS without AdGuard.
+- **Deleted all 794 Failed pods.** The flood stopped immediately (0 status-patch errors afterwards).
+- **Truncated `/var/log/messages`**. Root disk is down from 86% to 11% (103G used). Rotation was deliberately not added: without the flood the file grows slowly, but it is still unbounded, so check it now and then.
+
+### Possible relevance to the hangs (unproven)
+
+The flood ran for the whole hang period. The 17 May crash came five days after the upgrade, the 4 June crash showed the disk at 100% utilisation / 36.8% iowait, and the 25 June hang's last log line was one of these tigera-operator status-patch failures. The 25 June one is most likely just the last line written, not the cause, since the flood was continuous. Still, ~5 GiB/day of writes, double-written to journal and rsyslog, is sustained disk I/O the box no longer has to do. If iowait baselines drop and the hang rate falls from here, that's worth recording. It doesn't change the RAM/hardware assessment above on its own.
 
 ## Next steps
 

@@ -70,6 +70,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - **cert-manager:** Let's Encrypt certs via Cloudflare DNS-01 challenge (JSON logging enabled)
 - **Cloudflared:** Cloudflare tunnel for services not on ingress
 - **NFS mounts:** TrueNAS (freenas.home/10.0.0.129) serves media via NFS to radarr/sonarr pods. Mounts configured as soft (timeo=50, retrans=3) to prevent node lockups.
+- **Node DNS (host config, not in git):** NetworkManager `enp1s0` uses `ipv4.dns 10.0.0.8 1.1.1.1` (AdGuard first, public fallback) via systemd-resolved, and `/etc/hosts` pins `10.0.0.129 freenas.home`. AdGuard runs on this node, so the node must never depend on it alone. CoreDNS forwards public names to 8.8.8.8/1.1.1.1 and `home`/`lan` to AdGuard, with a `hosts` override for `freenas.home`. The node is not Ansible-managed despite the marker in `/etc/hosts`.
 
 ### Other
 
@@ -96,6 +97,8 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 ### Known Issues (Resolved)
 - **2026-05-17 crash:** Node locked up due to NFS hard mount hang, compounded by degraded 100Mbps network link (bad cable). iowait climbed from 14% to 39% over an hour before the node became unresponsive. Fix: replaced cable (1Gbps restored), changed NFS mounts from hard to soft.
 - **2026-06-04 crash:** Node hard-locked at ~23:31 UTC, down 36.5 hours. Last kernel event: Netdata child pod OOM-killed at 23:30:55 (go.d.plugin exceeded 512Mi cgroup limit). Disk was at 100% utilisation, iowait 36.8%. Root cause of actual kernel lock unknown — no pstore/kdump configured at the time. Fix: bumped Netdata child memory limit to 1Gi; crash capture infrastructure added (see below).
+
+- **2026-10-16 cluster stuck after reboot:** the root disk hit 86% because kubelet had been flooding `/var/log/messages` (713G, never rotated) since the 1.24→1.34 k3s upgrade on 2026-05-12. It was failing to patch status on 794 stale evicted pods (`qosClass` immutable). Image GC then removed the pause image, and the node's only DNS server was AdGuard on the node itself, so no sandbox could start. Fix: node DNS fallback + `/etc/hosts`, CoreDNS `freenas.home` override, deleted Failed pods, truncated `messages`. If Failed/Evicted pods pile up again, delete them. Details: `docs/nuc-power-crash-investigation-2026-06.md`.
 
 ### Crash Capture Infrastructure
 
