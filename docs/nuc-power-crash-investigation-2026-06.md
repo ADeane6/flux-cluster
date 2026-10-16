@@ -171,6 +171,8 @@ The flood ran for the whole hang period. The 17 May crash came five days after t
 
 **The freezes are far more frequent than this doc's timeline shows.** The watchdog log has ~35 TrueNAS power-cycles between June and 16 Oct, roughly one every 3-5 days. Some freezes self-reset with no power-cycle (e.g. 23 Sept: froze ~22:16 UTC, booted 22:24:19 with voltage steady and the plug untouched). Self-resets with `kernel.panic=10` could mean a panic that left nothing in `/var/crash`. Check `/sys/fs/pstore` (root-only) after the next one.
 
+**Test in progress:** the freezes started 5 days after the kubelet log flood began (12 May → 17 May), so watch the freeze rate with the flood gone. At one every 3-5 days, a quiet week from 16 Oct is meaningful. Count power-cycles in the TrueNAS watchdog log. If the freezes keep the same rate, move on to memtest86+.
+
 ### Why the plug / watchdog sometimes fail
 
 - **The plug reboots every 15 min while the NUC is down.** It runs Athom's factory ESPHome firmware with the default `api: reboot_timeout: 15min`, and its only API client is Home Assistant, which runs on the NUC. So a NUC freeze puts the plug into a reboot loop (seen as `energy_kwh` resets on 21 Sept, 23 Sept and 16 Oct). The ESP8266 reassociating with the AP every 15 min is the likely link to "the AP needs a restart to reach the plug" around hangs (hypothesis, not confirmed). The factory firmware kept the relay closed through these soft reboots (NUC draw continuous across them).
@@ -189,7 +191,7 @@ The flood ran for the whole hang period. The 17 May crash came five days after t
 4. ~~Set the NUC BIOS to power on after AC loss, so it self-recovers instead of sitting dead for ~40h.~~ Done (24 June 2026). The BIOS has no such option, so it's handled in software by clearing the PCH `GEN_PMCON_A` AFTERG3 bit at every boot. See [nuc-auto-power-on.md](nuc-auto-power-on.md).
 5. After the next event, check the NUC BIOS / board event log (logs unexpected power loss independently of the OS).
 6. Exclusion checks for hygiene:
-   - `sudo smartctl -a /dev/sda` (check `Unexpect_Power_Loss_Ct` / `Power-Off_Retract_Count`, which should have bumped by ~2 over the weekend if it lost power, plus reallocated sectors and CRC errors)
+   - ~~`sudo smartctl -a /dev/sda`~~ Done (16 Oct 2026): healthy. 0 reallocated sectors/events, 0 CRC, 0 read errors, empty error log, wear 100. `Total_LBAs_Written` raw 2,633,231 (unit unclear, likely MiB, ~2.6 TB). The drive doesn't report `Unexpect_Power_Loss_Ct`. Rules out media wear and a bad SATA link; a firmware stall under sustained writes is still possible and wouldn't show here.
    - memtest86+ overnight to definitively clear the RAM. **Priority after the 25 June hang** — RAM is now the leading suspect for that event (silent freeze, no trace, non-ECC so EDAC can't report bad bits).
 7. Likely fix: swap the PSU / DC barrel jack, and put the NUC on a UPS so a sag or a flaky supply can't drop it (and the UPS gives an independent power-event log).
 8. ~~Add detection/alerting for unattended events.~~ Done (24 June 2026). The TrueNAS watchdog (`nuc-watchdog.sh`) now sends Discord alerts when it power-cycles the NUC, again if the cycle didn't recover it, and an all-clear when it's back. See the "Detecting an event you weren't awake for" section of [nuc-outage-runbook.md](nuc-outage-runbook.md). Caveat: only catches events long enough to cross the watchdog's ~6-min fail threshold; shorter blips show only in the plug log.
