@@ -8,6 +8,7 @@ The point of the runbook is that we've now seen several distinct failure modes o
 - **OOM-driven lock** (4 June 2026): Netdata child OOM-killed, disk at 100%, kernel hard-locked, nothing captured (no pstore/kdump at the time).
 - **Kernel panic class** (not yet seen): the reason pstore + kdump + `*_panic=1` were armed. Would leave data in `/sys/fs/pstore` or `/var/crash`.
 - **Power loss, unconfirmed cause** (19-20 June 2026): instant, unlogged, no kernel trace, prime suspect internal PSU. See [nuc-power-crash-investigation-2026-06.md](nuc-power-crash-investigation-2026-06.md). Still ONGOING.
+- **Silent freeze** (25 June 2026 onwards, ~35 events to 16 Oct, the common case): voltage steady, draw drops to an idle floor, nothing logged or captured. Sometimes self-resets after ~8 min, otherwise the watchdog power-cycles it. Cause unknown; the kubelet log flood (May-Oct 2026) is under test as a trigger, RAM is next. See the investigation doc.
 
 Work the checklist top to bottom every time. The whole list is cheap and the failure modes overlap (e.g. a power cut and an OOM can both end with an unclean boot), so confirm by exclusion, don't pattern-match on the last incident.
 
@@ -27,15 +28,21 @@ This is the new problem since auto power-on: a night-time power blip now self-re
 
 The TrueNAS watchdog (`nuc-watchdog.sh`, cron every 2 min) sends Discord alerts. It's the right place for this: it already detects the NUC is gone and decides whether to power-cycle, so an alert means TrueNAS actually had to intervene, not a guess from power readings. It runs on TrueNAS, so it fires even when the NUC is the thing that's down.
 
-Three messages:
+Messages, in the order a freeze produces them:
 
+- 🟠 **NUC unreachable, likely frozen** — fired when the ping + SSH confirmation first fails (~4-6 min into an outage). This is the "a freeze is happening" alert.
 - 🔴 **NUC down, power-cycling** — fired when the watchdog performs the restart (after 3 ping fails + ping/SSH confirm + 5-min recheck).
 - 🔴 **STILL down after power-cycle** — fired on the second power-cycle of an incident, i.e. the first restart didn't bring it back (the manual-intervention / 40h case). Silent after that to avoid spam.
-- 🟢 **NUC back up (down Xm total)** — all-clear, gated on a power-cycle having happened, so brief network blips that never reached a restart stay silent.
+- 🔴 **Power-cycle failed** — the plug never confirmed its relay ON after retries, so the NUC may be sitting unpowered. Go and check the plug.
+- 🟢 **NUC back up (down Xm total)** — after a power-cycle.
+- 🟢 **NUC back on its own, no power-cycle** — the NUC self-reset after the 🟠 (e.g. 23 Sept). Check `/sys/fs/pstore` for a panic.
+- 📊 **Weekly report** (Fridays 09:00) — outages / power-cycles / self-recoveries over the last 7 days, from `nuc-freeze-report.sh`.
 
-Incident state (`nuc_incident_start`, `nuc_powercycle_count` in the scripts dir) persists across cron runs until recovery. The script is version-controlled at [`Local-apps/nuc-watchdog/`](../Local-apps/nuc-watchdog/) with the webhook blanked; the real Discord webhook URL is set only in the deployed copy on TrueNAS (it's a secret, kept out of git).
+Every send logs `Discord notify: HTTP <code>` to the watchdog log (204 = delivered). Alerts depend on TrueNAS resolving `discordapp.com`. Its primary DNS is AdGuard on the NUC, so nameserver2 `1.1.1.1` must stay set, or alerts silently fail during exactly the outages they're for (this is why no alerts arrived before 16 Oct 2026).
 
-Note the gap this leaves: a power blip that the NUC rides through or recovers from in under ~6 min (before the watchdog crosses its fail threshold) won't trigger an alert. For those, the TrueNAS plug log (above) is still the forensic record. If catching short events proves important, add a plug-side watcher as a second source.
+Incident state (`nuc_incident_start`, `nuc_powercycle_count`, `nuc_confirm_start` in the scripts dir) persists across cron runs until recovery. The script is version-controlled at [`Local-apps/nuc-watchdog/`](../Local-apps/nuc-watchdog/) with the webhook blanked; the real Discord webhook URL is set only in the deployed copy on TrueNAS (it's a secret, kept out of git).
+
+Note the gap this leaves: an outage the NUC recovers from before the ping + SSH confirmation fails won't alert. For those, the TrueNAS plug log (above) is still the forensic record.
 
 This all assumes TrueNAS is up to do the watching. A **whole-house power cut** takes TrueNAS down too, so it's handled separately by a cloud dead-man's switch (TrueNAS + router ping healthchecks.io; the cloud alerts when the pings stop). See [house-power-outage-detection.md](house-power-outage-detection.md).
 
@@ -92,6 +99,17 @@ journalctl -b -1 | grep -iE 'thermal|mce|machine check|hardware error|cpu.*throt
 journalctl -b -1 -u watchdog                       # software watchdog daemon (load>80 / mem<64MB / router ping)
 # On TrueNAS:
 tail -50 /mnt/all/config/scripts/nuc-watchdog.log  # ping fail / SSH check / plug power-cycle
+# Plug attempt lines show "HTTP <code>, state true|false|unreachable" for each turn_off/turn_on.
+# Watchdog log times are BST (TrueNAS local), the NUC journal and plug CSV are UTC.
+```
+
+### G2. Self-reset vs watchdog power-cycle
+
+```sh
+last -x -F reboot | head -3     # boot time
+# On TrueNAS: did the watchdog cycle before that boot? If the boot predates "initiating power cycle", the NUC reset itself.
+# For a self-reset, check pstore (root-only) before anything else:
+sudo ls -la /sys/fs/pstore/
 ```
 
 ### H. Network / NIC (the bad-cable signature)
@@ -125,7 +143,9 @@ Once you have the TrueNAS plug rows around the event:
 | voltage sags noticeably just before `power_w` collapses | **mains brownout** the PSU couldn't ride through |
 | `status=UNREACHABLE` / plug stops reporting | **plug or upstream** lost power (and check whether TrueNAS, now on its own plug, was affected too) |
 
-Caveat: sub-second brownouts may slip between samples. The poll is 2s and the true resolution is capped by the ESPHome `update_interval`. If a sag is suspected but not captured, drop the voltage/power `update_interval` in the `esphome_config` repo.
+Caveat: sub-second brownouts may slip between samples. The poll is 2s, but the true resolution is capped by the plug's sensor update interval: the `sensor_update_interval` substitution in `nuc-smart-plug.yaml` in the ESPHome dashboard (Athom package default 10s). If a sag is suspected but not captured, lower it there.
+
+Also: an `energy_kwh` reset to ~0 means the **plug** rebooted, not the NUC.
 
 ## After confirming the class
 

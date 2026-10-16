@@ -1,6 +1,11 @@
 # NUC Power Crash Investigation (June 2026)
 
-**Status: ONGOING.** The failure mode is identified (instant, unlogged power loss to the NUC) and a prime suspect named (internal PSU / DC input), but the root cause is not confirmed. Confirmation needs the next event captured with the power-side telemetry that is now in place (see Next steps). We can't yet separate an internal PSU fault from a brief mains sag without that trace. The mitigations (auto power-on, split plugs, plug monitor) are done; the diagnosis is not. When the next event lands, work [nuc-outage-runbook.md](nuc-outage-runbook.md).
+**Status: ONGOING.** Two failure modes:
+
+- **Instant power loss** (19-20 June only): prime suspect the internal PSU / DC input, not confirmed. Not seen since.
+- **Silent freeze** (25 June onwards, ~35 events to 16 Oct, the active problem): powered but frozen, nothing captured, recovered by the watchdog power-cycle or a self-reset. Cause unknown. **Current test:** the freezes began 5 days after a kubelet log flood started (May k3s upgrade), and the flood was removed on 16 Oct. The weekly Discord report on 23 Oct is the first read. If freezes continue at the old rate, run memtest86+.
+
+Mitigations (auto power-on, split plugs, plug monitor, watchdog with verified power-cycles and Discord alerts, plug reflashed to stop its reboot loop) are done. The diagnosis is not. When the next event lands, work [nuc-outage-runbook.md](nuc-outage-runbook.md).
 
 **Update 30 June 2026:** the NUC has hung four times over three days (25, 28, and twice on 30 June). Every one was a hang, not a power loss (steady voltage, non-zero draw, watchdog-recovered), and nothing was captured (no panic, no kdump). All four self-recovered via the watchdog + auto power-on. Leading suspect is the non-ECC RAM (uncleared); next step is memtest86+. Details in the Update sections below.
 
@@ -184,7 +189,7 @@ The flood ran for the whole hang period. The 17 May crash came five days after t
 ## Next steps
 
 1. ~~Split the NUC and TrueNAS onto independent plugs so they can be observed separately and one can't take the other down.~~ Done (24 June 2026).
-2. ~~Enable the NUC plug's voltage sensor (if the chip supports it) and sample fast (~1s).~~ Done (24 June 2026). The plug reports voltage (~242V), and it's being recorded. Note the real resolution is capped by the ESPHome `update_interval` (in the `esphome_config` repo), not the 2s poll, so a sub-second brownout may still be missed. This is what distinguishes the three remaining possibilities:
+2. ~~Enable the NUC plug's voltage sensor (if the chip supports it) and sample fast (~1s).~~ Done (24 June 2026). The plug reports voltage (~242V), and it's being recorded. Note the real resolution is capped by the plug's `sensor_update_interval` (Athom package default 10s, set in `nuc-smart-plug.yaml` in the ESPHome dashboard since the 16 Oct reflash), not the 2s poll, so a sub-second brownout may still be missed. This is what distinguishes the three remaining possibilities:
    - relay reported on, draw drops to 0W instantly -> internal PSU / board fault (expected)
    - relay off / plug stops reporting -> plug or upstream cut power
    - input voltage sags just before draw collapses -> mains brownout the PSU couldn't ride through
@@ -193,6 +198,8 @@ The flood ran for the whole hang period. The 17 May crash came five days after t
 5. After the next event, check the NUC BIOS / board event log (logs unexpected power loss independently of the OS).
 6. Exclusion checks for hygiene:
    - ~~`sudo smartctl -a /dev/sda`~~ Done (16 Oct 2026): healthy. 0 reallocated sectors/events, 0 CRC, 0 read errors, empty error log, wear 100. `Total_LBAs_Written` raw 2,633,231 (unit unclear, likely MiB, ~2.6 TB). The drive doesn't report `Unexpect_Power_Loss_Ct`. Rules out media wear and a bad SATA link; a firmware stall under sustained writes is still possible and wouldn't show here.
-   - memtest86+ overnight to definitively clear the RAM. **Priority after the 25 June hang** — RAM is now the leading suspect for that event (silent freeze, no trace, non-ECC so EDAC can't report bad bits).
+   - memtest86+ overnight to definitively clear the RAM (silent freeze, no trace, non-ECC so EDAC can't report bad bits). **Still not run.** Deferred behind the flood-removal test (step 9): run it if the 23 Oct weekly report still shows freezes.
 7. Likely fix: swap the PSU / DC barrel jack, and put the NUC on a UPS so a sag or a flaky supply can't drop it (and the UPS gives an independent power-event log).
-8. ~~Add detection/alerting for unattended events.~~ Done (24 June 2026). The TrueNAS watchdog (`nuc-watchdog.sh`) now sends Discord alerts when it power-cycles the NUC, again if the cycle didn't recover it, and an all-clear when it's back. See the "Detecting an event you weren't awake for" section of [nuc-outage-runbook.md](nuc-outage-runbook.md). Caveat: only catches events long enough to cross the watchdog's ~6-min fail threshold; shorter blips show only in the plug log.
+8. ~~Add detection/alerting for unattended events.~~ Done (24 June 2026). The TrueNAS watchdog (`nuc-watchdog.sh`) now sends Discord alerts when it power-cycles the NUC, again if the cycle didn't recover it, and an all-clear when it's back. See the "Detecting an event you weren't awake for" section of [nuc-outage-runbook.md](nuc-outage-runbook.md). Caveat: only catches events long enough to cross the watchdog's ~6-min fail threshold; shorter blips show only in the plug log. **Note:** no alert actually reached Discord until 16 Oct 2026, because TrueNAS resolved DNS only via AdGuard on the NUC (fixed with nameserver2 `1.1.1.1`). A 🟠 freeze-detected alert and a self-recovery all-clear were added at the same time.
+9. **Flood-removal test (in progress from 16 Oct 2026).** The kubelet log flood (12 May - 16 Oct) is removed. A TrueNAS cron job posts a weekly Discord report (Fridays 09:00) of outages, power-cycles and self-recoveries; see [nuc-watchdog README](../Local-apps/nuc-watchdog/README.md). 23 Oct is the first week fully after the fix. No freezes → the flood was very likely the trigger; keep watching, since gaps of ~2 weeks have happened before. Freezes continue → memtest86+ (step 6).
+10. After any self-reset (🟢 "back on its own"), check `sudo ls /sys/fs/pstore/` first. With `kernel.panic=10`, a panic could reboot the box with nothing in `/var/crash`.

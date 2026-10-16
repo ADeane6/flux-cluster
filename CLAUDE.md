@@ -27,10 +27,11 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 ### Smart Home
 
 - **Zigbee radio:** UZG-01 XZG gateway (10.0.1.52), connected to zigbee2mqtt via TCP (tcp://10.0.1.52:6638)
-- **Home Assistant:** Runs in k8s with hostNetwork, manages automations, Zigbee devices via zigbee2mqtt/MQTT. Remote Logger HACS integration sends structured OTLP logs to Loki.
+- **Home Assistant:** Runs in k8s (not hostNetwork; ESPHome is the hostNetwork pod), manages automations, Zigbee devices via zigbee2mqtt/MQTT. Remote Logger HACS integration sends structured OTLP logs to Loki.
 - **MQTT broker:** Mosquitto in k8s
 - **Voice assistant stack:** Piper (TTS), Whisper (STT), OpenWakeWord (wake word detection)
 - **ESPHome:** Config synced from git (github.com/ADeane6/esphome_config), runs with hostNetwork + privileged for mDNS
+- **NUC smart plug** (`10.0.1.89`, Athom Plug V2, ESPHome device `nuc-smart-plug`): powers the NUC, used by the TrueNAS watchdog and plug monitor. Config has `api`/`wifi` `reboot_timeout: 0s` (HA runs on the NUC, so the default 15-min timeout made the plug reboot-loop during NUC outages), `early_pin_init: "false"` (otherwise every plug restart/OTA cuts the NUC), and `Power On State: Always On`. REST URLs use entity names (`/switch/Switch`, `/sensor/Voltage`); don't rename entities.
 
 ### Media Stack
 
@@ -100,6 +101,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - **2026-06-04 crash:** Node hard-locked at ~23:31 UTC, down 36.5 hours. Last kernel event: Netdata child pod OOM-killed at 23:30:55 (go.d.plugin exceeded 512Mi cgroup limit). Disk was at 100% utilisation, iowait 36.8%. Root cause of actual kernel lock unknown — no pstore/kdump configured at the time. Fix: bumped Netdata child memory limit to 1Gi; crash capture infrastructure added (see below).
 
 - **2026-10-16 cluster stuck after reboot:** the root disk hit 86% because kubelet had been flooding `/var/log/messages` (713G, never rotated) since the 1.24→1.34 k3s upgrade on 2026-05-12. It was failing to patch status on 794 stale evicted pods (`qosClass` immutable). Image GC then removed the pause image, and the node's only DNS server was AdGuard on the node itself, so no sandbox could start. Fix: node DNS fallback + `/etc/hosts`, CoreDNS `freenas.home` override, deleted Failed pods, truncated `messages`. If Failed/Evicted pods pile up again, delete them. Details: `docs/nuc-power-crash-investigation-2026-06.md`.
+- **Silent freezes (ONGOING, ~35 between June and Oct 2026):** the NUC freezes with power present and nothing captured, and recovers via a watchdog power-cycle or a self-reset. The freezes began 5 days after the kubelet log flood started, and that flood was removed 16 Oct 2026; the weekly report tracks whether they stop. memtest86+ is next if they don't. Also fixed 16 Oct: the watchdog didn't verify power-cycles (21 Sept: NUC left unpowered 40 min), the plug reboot-looped during outages, and Discord alerts never arrived (TrueNAS DNS was AdGuard-only).
 
 ### Crash Capture Infrastructure
 
@@ -109,7 +111,7 @@ Set up on `tomnuc.home` to capture data from the next hang:
 - **NMI watchdog** (`nmi_watchdog=1`, `hardlockup_panic=1` via sysctl, `softlockup_panic=1`): forces a kernel panic if a CPU freezes for >10s, enabling pstore/kdump to capture it.
 - **kdump** (`crashkernel=512M`): kexec crash kernel saves full memory dump to `/var/crash/` on panic. Analyse with `crash` + `debuginfo-install kernel-$(uname -r)`.
 - **Software watchdog** (`watchdog` daemon): reboots if load average >80 (1min) or free memory <64MB. Pings router (10.0.3.254) to detect NIC failure. Required `setcap cap_net_raw+ep /usr/sbin/watchdog` for ping to work.
-- **TrueNAS watchdog** (`/mnt/all/config/scripts/nuc-watchdog.sh`, cron every 2min): pings NUC, then SSH port check, then 5-min recheck before power-cycling via ESPHome smart plug (10.0.1.89). Logs to `/mnt/all/config/scripts/nuc-watchdog.log`.
+- **TrueNAS watchdog** (`/mnt/all/config/scripts/nuc-watchdog.sh`, cron every 2min): pings NUC, then SSH port check, then 5-min recheck before power-cycling via ESPHome smart plug (10.0.1.89). Each plug command is verified by reading the relay state back. Discord alerts on freeze detection (🟠), power-cycle, failed cycle and recovery, plus a weekly freeze report (Fridays 09:00, `nuc-freeze-report.sh`). Logs to `/mnt/all/config/scripts/nuc-watchdog.log` (BST timestamps). Source + deploy steps: `Local-apps/nuc-watchdog/`.
 
 Full setup guide: `docs/nuc-crash-capture-setup.md`
 

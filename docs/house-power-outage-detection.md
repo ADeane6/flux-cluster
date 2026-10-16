@@ -33,6 +33,8 @@ Ping command (same on every source):
 curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/<check-uuid>
 ```
 
+Every source must resolve `hc-ping.com` without AdGuard (which runs on the NUC). Until 16 Oct 2026, TrueNAS's only DNS server was AdGuard, so a NUC outage also stopped TrueNAS's pings. With TrueNAS as the only source, a long enough NUC freeze could look like a house power cut. TrueNAS now has nameserver2 `1.1.1.1`. Give the router source a non-AdGuard resolver too.
+
 ## Adding the router (UCG Ultra) long-term — loose steps
 
 The router is the best second source: independent of TrueNAS, and its power state best represents the house. The UCG Ultra runs UniFi OS (Debian-based, has `curl` and `cron`), but **wipes custom changes on reboot and firmware updates**, so a plain crontab entry won't persist. Make it persistent with the community `on_boot.d` boot-script hook.

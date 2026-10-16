@@ -113,8 +113,12 @@ Then read the trace at the moment power/draw drops:
 Env vars: `PLUG_IP` (default 10.0.1.89), `INTERVAL` (default 2s),
 `RETAIN_DAYS` (default 30), `LOG_DIR` (default /mnt/all/config/nuc-plug-logs).
 
-Resolution caveat: the real sampling resolution is capped by the sensor
-`update_interval` in the ESPHome config (github.com/ADeane6/esphome_config), not by
-`INTERVAL` here. Polling faster than the sensor updates just re-reads the same
-value. To catch a fast brownout, drop the plug's power/voltage `update_interval`
-to ~1s there.
+Resolution caveat: the real sampling resolution is capped by the plug's
+`sensor_update_interval` substitution (Athom package default 10s) in
+`nuc-smart-plug.yaml` in the ESPHome dashboard, not by `INTERVAL` here. Polling
+faster than the sensor updates just re-reads the same value. To catch a fast
+brownout, lower it to ~1s there.
+
+The URLs use entity names (`/sensor/Voltage` etc.) because the plug runs newer
+ESPHome since the 16 Oct 2026 reflash. Renaming the entities breaks this script and
+the watchdog. An `energy` reset to ~0 in the CSV means the plug rebooted.
