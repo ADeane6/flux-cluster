@@ -87,7 +87,7 @@ ssh truenas 'tail -3 /mnt/all/config/nuc-plug-logs/nuc-plug-$(date -u +%F).csv'
 ```
 
 If it's stalled or missing: check the plug is reachable
-(`curl -s http://10.0.1.89/sensor/power`), then just re-run the `daemon` line
+(`curl -s http://10.0.1.89/sensor/Power`), then just re-run the `daemon` line
 (or wait for the cron minute) to restart it.
 
 ## Reading it after a NUC crash

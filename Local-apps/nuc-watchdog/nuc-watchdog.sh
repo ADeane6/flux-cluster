@@ -34,7 +34,7 @@ timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
 check_ping() { ping -c 2 -t 5 "$NUC_HOST" > /dev/null 2>&1; }
 check_ssh()  { nc -z -w 5 "$NUC_HOST" 22 > /dev/null 2>&1; }
 
-PLUG_URL="http://${SMART_PLUG_IP}/switch/smart_plug_v2"
+PLUG_URL="http://${SMART_PLUG_IP}/switch/Switch"
 
 # Prints "true", "false", or nothing if the plug didn't answer.
 plug_state() {

@@ -20,7 +20,8 @@
 #       -> upstream mains / plug itself lost power
 #
 # ESPHome web_server v2 REST API, no auth:
-#   GET http://<ip>/sensor/{voltage,current,power,energy} -> {"value": <num>, ...}
+#   GET http://<ip>/sensor/{Voltage,Current,Power,Energy} -> {"value": <num>, ...}
+#   (newer ESPHome addresses entities by name, not object id)
 
 set -u
 
@@ -49,10 +50,10 @@ while true; do
     find "$LOG_DIR" -name 'nuc-plug-*.csv' -type f -mtime "+${RETAIN_DAYS}" -delete 2>/dev/null
   fi
 
-  voltage="$(read_sensor voltage)"
-  current="$(read_sensor current)"
-  power="$(read_sensor power)"
-  energy="$(read_sensor energy)"
+  voltage="$(read_sensor Voltage)"
+  current="$(read_sensor Current)"
+  power="$(read_sensor Power)"
+  energy="$(read_sensor Energy)"
 
   if [ -n "$voltage" ] || [ -n "$power" ]; then
     status="OK"
