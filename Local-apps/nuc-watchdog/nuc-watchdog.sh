@@ -34,6 +34,30 @@ timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
 check_ping() { ping -c 2 -t 5 "$NUC_HOST" > /dev/null 2>&1; }
 check_ssh()  { nc -z -w 5 "$NUC_HOST" 22 > /dev/null 2>&1; }
 
+PLUG_URL="http://${SMART_PLUG_IP}/switch/smart_plug_v2"
+
+# Prints "true", "false", or nothing if the plug didn't answer.
+plug_state() {
+    curl -s --connect-timeout 5 --max-time 10 "$PLUG_URL" | grep -o '"value":[a-z]*' | cut -d: -f2
+}
+
+# $1 = turn_on|turn_off, $2 = expected state (true|false). The plug has been seen
+# accepting a command but applying it ~40s late or not at all, so read the state back
+# rather than trusting the POST.
+set_plug() {
+    attempt=1
+    while [ "$attempt" -le 6 ]; do
+        code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 10 -X POST "${PLUG_URL}/$1")
+        sleep 2
+        state=$(plug_state)
+        echo "$(timestamp) Plug $1 attempt ${attempt}: HTTP ${code}, state ${state:-unreachable}" >> "$LOG"
+        [ "$state" = "$2" ] && return 0
+        sleep 8
+        attempt=$((attempt + 1))
+    done
+    return 1
+}
+
 # Send a Discord message. $1 must not contain " or \ (our messages don't).
 notify() {
     [ -n "$NOTIFY_WEBHOOK" ] || return 0
@@ -140,8 +164,21 @@ elif [ "$cycles" -eq 2 ]; then
 fi
 # cycles >= 3: stay silent to avoid spam, just keep cycling and logging
 
-curl -s -X POST "http://${SMART_PLUG_IP}/switch/smart_plug_v2/turn_off" >> "$LOG" 2>&1
+set_plug turn_off false || echo "$(timestamp) Could not confirm plug OFF, turning on anyway" >> "$LOG"
 sleep 10
-curl -s -X POST "http://${SMART_PLUG_IP}/switch/smart_plug_v2/turn_on" >> "$LOG" 2>&1
 
-echo "$(timestamp) Power cycle complete (cycle #${cycles})" >> "$LOG"
+# A late-applied turn_off can land after turn_on was confirmed, so re-check once.
+plug_failed=0
+if set_plug turn_on true; then
+    sleep 30
+    [ "$(plug_state)" = "true" ] || set_plug turn_on true || plug_failed=1
+else
+    plug_failed=1
+fi
+
+if [ "$plug_failed" -eq 0 ]; then
+    echo "$(timestamp) Power cycle complete (cycle #${cycles})" >> "$LOG"
+else
+    echo "$(timestamp) Power cycle FAILED, plug not confirmed ON (cycle #${cycles})" >> "$LOG"
+    notify ":red_circle: ${MENTION} Power-cycle failed — plug did not confirm ON, NUC may be left unpowered"
+fi

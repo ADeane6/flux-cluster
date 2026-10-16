@@ -4,7 +4,7 @@
 
 **Update 30 June 2026:** the NUC has hung four times over three days (25, 28, and twice on 30 June). Every one was a hang, not a power loss (steady voltage, non-zero draw, watchdog-recovered), and nothing was captured (no panic, no kdump). All four self-recovered via the watchdog + auto power-on. Leading suspect is the non-ECC RAM (uncleared); next step is memtest86+. Details in the Update sections below.
 
-**Update 16 October 2026:** three reboots early on the 16th (not yet investigated). The cluster then stayed down ~2.5h because of a DNS deadlock and a kubelet log flood that had been filling the disk since the May k3s upgrade. Both are fixed; see the 16 October section.
+**Update 16 October 2026:** another silent freeze (04:28 UTC). The watchdog log shows ~35 of these since June. The cluster then stayed down ~2.5h because of a DNS deadlock and a kubelet log flood that had been filling the disk since the May k3s upgrade; both are fixed. Also found that the plug reboots every 15 min while HA is down, and that the watchdog didn't verify the relay state, which caused the 21 Sept failed recovery (fixed). See the 16 October section.
 
 ## Summary
 
@@ -141,7 +141,7 @@ The pattern (silent freeze, no log, no panic, no resource cause) points at hardw
 
 ## Update — 16 October 2026: cluster stuck after reboots (DNS deadlock + kubelet log flood)
 
-The node rebooted three times early on 16 Oct (journal boots end 04:28, 05:38, 05:48 UTC). The reboots themselves have **not been investigated yet**. Check the TrueNAS watchdog and plug logs per [nuc-outage-runbook.md](nuc-outage-runbook.md). This section covers why the cluster stayed broken after the node came back. Every pod sat in `FailedCreatePodSandBox` for ~2.5h.
+The node rebooted three times early on 16 Oct (journal boots end 04:28, 05:38, 05:48 UTC): one real freeze and two manual reboots (see "The reboots themselves" below). This section first covers why the cluster stayed broken after the node came back. Every pod sat in `FailedCreatePodSandBox` for ~2.5h.
 
 ### Chain of failure
 
@@ -163,6 +163,19 @@ Earlier reboots never hit this because the pause image was still cached, so the 
 ### Possible relevance to the hangs (unproven)
 
 The flood ran for the whole hang period. The 17 May crash came five days after the upgrade, the 4 June crash showed the disk at 100% utilisation / 36.8% iowait, and the 25 June hang's last log line was one of these tigera-operator status-patch failures. The 25 June one is most likely just the last line written, not the cause, since the flood was continuous. Still, ~5 GiB/day of writes, double-written to journal and rsyslog, is sustained disk I/O the box no longer has to do. If iowait baselines drop and the hang rate falls from here, that's worth recording. It doesn't change the RAM/hardware assessment above on its own.
+
+### The reboots themselves
+
+- **04:28 UTC: a real freeze, same class as June.** Voltage steady at ~244V, draw fell from ~31W to an idle ~13W and held until the watchdog cycled power at 04:40. Healthy beforehand (54GB free, ~5% CPU, iowait <1%), nothing in the kernel log or `/var/crash`.
+- 05:38 and 05:48: manual, not faults.
+
+**The freezes are far more frequent than this doc's timeline shows.** The watchdog log has ~35 TrueNAS power-cycles between June and 16 Oct, roughly one every 3-5 days. Some freezes self-reset with no power-cycle (e.g. 23 Sept: froze ~22:16 UTC, booted 22:24:19 with voltage steady and the plug untouched). Self-resets with `kernel.panic=10` could mean a panic that left nothing in `/var/crash`. Check `/sys/fs/pstore` (root-only) after the next one.
+
+### Why the plug / watchdog sometimes fail
+
+- **The plug reboots every 15 min while the NUC is down.** It runs Athom's factory ESPHome firmware with the default `api: reboot_timeout: 15min`, and its only API client is Home Assistant, which runs on the NUC. So a NUC freeze puts the plug into a reboot loop (seen as `energy_kwh` resets on 21 Sept, 23 Sept and 16 Oct). The ESP8266 reassociating with the AP every 15 min is the likely link to "the AP needs a restart to reach the plug" around hangs (hypothesis, not confirmed). Fix (owned by user): flash the plug with `api`/`wifi` `reboot_timeout: 0s`.
+- **21 Sept failed recovery (54 min down, 4 cycles).** The NUC froze at ~19:40 UTC and self-reset (boot at 19:50:24). The watchdog started a cycle at 19:50:25. `turn_off` took effect ~40s late (19:51:04), after `turn_on` had already been sent, so the relay was left OFF. Cycles #2-#4 "completed" in 10-15s, but draw stayed at 0W even though the plug answered GETs throughout. The old script never checked the HTTP status or the relay state, and its curls had no timeout.
+- **Watchdog fixed (16 Oct):** every plug command is retried until a read-back of the relay state confirms it, ON is re-checked 30s later, each attempt's HTTP code/state is logged, curls have timeouts, and there's a new Discord alert if the plug never confirms ON. See [nuc-watchdog README](../Local-apps/nuc-watchdog/README.md).
 
 ## Next steps
 
