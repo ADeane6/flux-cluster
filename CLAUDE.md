@@ -11,7 +11,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 
 ### TrueNAS Jails
 
-- **Plex:** FreeBSD 13.2-RELEASE-p10, media server (no hardware transcoding). Alloy installed for log shipping to Loki. Netdata installed streaming to parent.
+- **Plex (`plex-stable`):** FreeBSD 13.2-RELEASE-p10, stopped since Plex was migrated to k8s. Alloy installed for log shipping to Loki, Netdata streaming to parent.
 - **Transmission:** FreeBSD 11.2-RELEASE-p15, torrent client. Too old for modern monitoring agents.
 
 ### Network
@@ -35,7 +35,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 
 ### Media Stack
 
-- **Plex:** In TrueNAS jail (not k8s), media server. No hardware transcode (Xeon E3-1220 v3 has no iGPU). Primary client: NVIDIA SHIELD Android TV with Onkyo TX-SR333 receiver.
+- **Plex:** Runs in k8s on the NUC (linuxserver image, LB `10.0.0.22`), migrated from the TrueNAS jail mainly for hardware transcoding: `/dev/dri` from the NUC's Intel UHD 620 (Quick Sync) is passed into the pod. Media via the NFS PVCs, transcode dir is an emptyDir. Primary client: NVIDIA SHIELD Android TV with Onkyo TX-SR333 receiver.
 - **Radarr:** Movie management (hotio image, CLEF JSON logging)
 - **Sonarr:** TV management (hotio image, CLEF JSON logging)
 - **Jackett:** Torrent indexer proxy (linuxserver image)
@@ -62,6 +62,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - **10.0.0.19:** Loki push API (used by Plex jail Alloy)
 - **10.0.0.20:** Netdata parent (used by Plex jail Netdata streaming)
 - **10.0.0.21:** Graphite-exporter (receives TrueNAS Graphite data)
+- **10.0.0.22:** Plex (port 32400)
 
 ### DNS & Networking
 
@@ -70,7 +71,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - **external-dns:** Manages Cloudflare DNS records from ingress annotations
 - **cert-manager:** Let's Encrypt certs via Cloudflare DNS-01 challenge (JSON logging enabled)
 - **Cloudflared:** Cloudflare tunnel for services not on ingress
-- **NFS mounts:** TrueNAS (freenas.home/10.0.0.129) serves media via NFS to radarr/sonarr pods. Mounts configured as soft (timeo=50, retrans=3) to prevent node lockups.
+- **NFS mounts:** TrueNAS (freenas.home/10.0.0.129) serves media via NFS to plex/radarr/sonarr pods. Mounts configured as soft (timeo=50, retrans=3) to prevent node lockups.
 - **Node DNS (host config, not in git):** NetworkManager `enp1s0` uses `ipv4.dns 10.0.0.8 1.1.1.1` (AdGuard first, public fallback) via systemd-resolved, and `/etc/hosts` pins `10.0.0.129 freenas.home`. AdGuard runs on this node, so the node must never depend on it alone. CoreDNS forwards public names to 8.8.8.8/1.1.1.1 and `home`/`lan` to AdGuard, with a `hosts` override for `freenas.home`. The node is not Ansible-managed despite the marker in `/etc/hosts`.
 - **TrueNAS DNS:** nameserver1 `10.0.0.8` (AdGuard), nameserver2 `1.1.1.1` (set in the UI, Network → Global Configuration). Without the fallback, every hostname-based call from TrueNAS (watchdog Discord alerts, healthchecks.io pings) fails exactly when the NUC is down. Anything that has to work during a NUC outage must not depend on AdGuard alone.
 
@@ -81,8 +82,8 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 ## Performance Investigation Areas
 
 ### Plex Transcoding
-- See docs/plex-optimisation.md for detailed findings
-- No hardware transcode available (Xeon E3-1220 v3 has no iGPU)
+- See docs/plex-optimisation.md for detailed findings (written while Plex was in the TrueNAS jail without hardware transcode)
+- Hardware transcode via the NUC iGPU (UHD 620 Quick Sync) since the move to k8s
 - Primary issue was audio-only transcoding on SHIELD due to disabled HDMI passthrough (now fixed)
 - Remote users transcode due to client bandwidth limits
 
