@@ -15,6 +15,10 @@ Runs on **TrueNAS** (not in k8s, not on the NUC). Pings `tomnuc.home` every 2 mi
 
 A blip the NUC rides through or recovers from before the ping + SSH confirmation fails won't alert. The TrueNAS plug log (`Local-apps/nuc-plug-monitor/`) is the forensic record for those.
 
+## Weekly freeze report
+
+`freeze-report.sh` posts a summary of the last 7 days to the same Discord webhook (read from the deployed watchdog script): number of outages, power-cycles, self-recoveries, failed cycles, and start times. Deployed as `/mnt/all/config/scripts/nuc-freeze-report.sh`, TrueNAS cron job id 6, Fridays 09:00. Check output without posting: `DRY_RUN=1 DAYS=30 sh /mnt/all/config/scripts/nuc-freeze-report.sh`.
+
 ## Deploy
 
 ```sh
