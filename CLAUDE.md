@@ -59,8 +59,8 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 ### MetalLB Service IPs
 
 - **10.0.0.18:** Alloy syslog listener
-- **10.0.0.19:** Loki push API (used by Plex jail Alloy)
-- **10.0.0.20:** Netdata parent (used by Plex jail Netdata streaming)
+- **10.0.0.19:** Loki push/query API (`loki-lb`). Was for the Plex jail's Alloy, now stopped; no known client as of Oct 2026 (in-cluster apps use `loki.monitoring.svc`, external devices log via syslog on 10.0.0.18).
+- **10.0.0.20:** Netdata parent (`netdata-lb`). Used by the Claude Code Netdata MCP (`http://10.0.0.20:19999/mcp`) and direct API queries.
 - **10.0.0.21:** Graphite-exporter (receives TrueNAS Graphite data)
 - **10.0.0.22:** Plex (port 32400)
 
