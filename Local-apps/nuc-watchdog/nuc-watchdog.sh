@@ -2,10 +2,12 @@
 # NUC watchdog — runs from TrueNAS cron every 2 minutes
 # Requires 3 ping failures, then ping+SSH confirmation, then 5-min recheck before power cycling
 #
-# Discord alerts (3 types):
+# Discord alerts:
+#   :orange_circle:     NUC unreachable ~6 min, confirmed by ping + SSH (likely frozen)
 #   :red_circle:        TrueNAS is power-cycling the NUC (first cycle of an incident)
 #   :red_circle:        NUC STILL down after the power-cycle (manual intervention needed)
-#   :green_circle:      NUC back up (only after a power-cycle, with total downtime)
+#   :red_circle:        power-cycle failed, plug never confirmed ON
+#   :green_circle:      NUC back up after a power-cycle, or back on its own after a confirmed outage
 # The two red alerts ping MENTION; the green all-clear does not.
 # Incident state (nuc_incident_start, nuc_powercycle_count) persists across cron runs
 # until the NUC recovers. The all-clear is gated on a power-cycle having happened, so
@@ -61,9 +63,10 @@ set_plug() {
 # Send a Discord message. $1 must not contain " or \ (our messages don't).
 notify() {
     [ -n "$NOTIFY_WEBHOOK" ] || return 0
-    curl -s -o /dev/null --max-time 10 -X POST "$NOTIFY_WEBHOOK" \
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 -X POST "$NOTIFY_WEBHOOK" \
         -H "Content-Type: application/json" \
-        --data-binary "{\"username\":\"NUC Watchdog\",\"content\":\"$1\"}" >> "$LOG" 2>&1
+        --data-binary "{\"username\":\"NUC Watchdog\",\"content\":\"$1\"}")
+    echo "$(timestamp) Discord notify: HTTP ${code}" >> "$LOG"
 }
 
 # Minutes since the incident started, as "Nm" (or "?" if unknown).
@@ -80,6 +83,10 @@ recover() {
         dt=$(downtime_str)
         notify ":green_circle: NUC back up (down ${dt} total)"
         echo "$(timestamp) NUC recovered, down ${dt} total" >> "$LOG"
+    elif [ -f "$CONFIRM_TIME_FILE" ]; then
+        dt=$(downtime_str)
+        notify ":green_circle: NUC back on its own, no power-cycle (down ${dt}). Check /sys/fs/pstore for a panic"
+        echo "$(timestamp) NUC recovered without power-cycle, down ${dt} total" >> "$LOG"
     fi
     rm -f "$FAIL_FILE" "$CONFIRM_TIME_FILE" "$INCIDENT_FILE" "$CYCLE_FILE"
 }
@@ -127,6 +134,7 @@ echo "$(timestamp) Confirmation failed — both ping and SSH port unreachable" >
 if [ ! -f "$CONFIRM_TIME_FILE" ]; then
     date +%s > "$CONFIRM_TIME_FILE"
     echo "$(timestamp) Starting ${CONFIRM_WAIT}s wait before final check" >> "$LOG"
+    notify ":orange_circle: ${MENTION} NUC unreachable for ~$(downtime_str) (ping + SSH), likely frozen. Power-cycling in ~5 min if it doesn't come back"
     exit 0
 fi
 
