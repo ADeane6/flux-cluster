@@ -26,6 +26,11 @@ data:
     home lan:53 {
         errors
         cache 30
+        # NFS and cloudflared must resolve TrueNAS while AdGuard is down
+        hosts {
+            10.0.0.129 freenas.home
+            fallthrough
+        }
         forward . 10.0.0.8
     }
 
