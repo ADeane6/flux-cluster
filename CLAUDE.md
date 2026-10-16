@@ -71,6 +71,7 @@ Home infrastructure GitOps repo managed by Flux. All changes go through git, nev
 - **Cloudflared:** Cloudflare tunnel for services not on ingress
 - **NFS mounts:** TrueNAS (freenas.home/10.0.0.129) serves media via NFS to radarr/sonarr pods. Mounts configured as soft (timeo=50, retrans=3) to prevent node lockups.
 - **Node DNS (host config, not in git):** NetworkManager `enp1s0` uses `ipv4.dns 10.0.0.8 1.1.1.1` (AdGuard first, public fallback) via systemd-resolved, and `/etc/hosts` pins `10.0.0.129 freenas.home`. AdGuard runs on this node, so the node must never depend on it alone. CoreDNS forwards public names to 8.8.8.8/1.1.1.1 and `home`/`lan` to AdGuard, with a `hosts` override for `freenas.home`. The node is not Ansible-managed despite the marker in `/etc/hosts`.
+- **TrueNAS DNS:** nameserver1 `10.0.0.8` (AdGuard), nameserver2 `1.1.1.1` (set in the UI, Network → Global Configuration). Without the fallback, every hostname-based call from TrueNAS (watchdog Discord alerts, healthchecks.io pings) fails exactly when the NUC is down. Anything that has to work during a NUC outage must not depend on AdGuard alone.
 
 ### Other
 

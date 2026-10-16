@@ -63,7 +63,8 @@ set_plug() {
 # Send a Discord message. $1 must not contain " or \ (our messages don't).
 notify() {
     [ -n "$NOTIFY_WEBHOOK" ] || return 0
-    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 -X POST "$NOTIFY_WEBHOOK" \
+    # AdGuard (TrueNAS's primary DNS) runs on the NUC, so lookups wait out its timeout before the fallback
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 -X POST "$NOTIFY_WEBHOOK" \
         -H "Content-Type: application/json" \
         --data-binary "{\"username\":\"NUC Watchdog\",\"content\":\"$1\"}")
     echo "$(timestamp) Discord notify: HTTP ${code}" >> "$LOG"
