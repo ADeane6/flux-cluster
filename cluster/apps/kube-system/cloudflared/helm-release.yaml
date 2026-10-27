@@ -29,7 +29,7 @@ spec:
       configmap.reloader.stakater.com/reload: "cloudflared-config"
     image:
       repository: cloudflare/cloudflared
-      tag: 2025.1.0
+      tag: 2026.10.3
 
     env:
       TZ: "Ireland/Dublin"
